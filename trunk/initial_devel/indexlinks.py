@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 ####################################
 ## Indices STRING-db.org links datafile after organism.
 ## Author: Stefan McKinnon H\oj-Edwards <sme@iysik.com>
@@ -31,7 +31,8 @@ with BZ2File(settings.links_fn_bz2) as inp:
     org, rest = line.split(b'.', 1)
     if org != last_org:
       # step back again and read line by line until we find the new organism.
-      inp.seek(position, 0)
+      inp.seek(position-jump, 0)
+      line = inp.readline()
       while True:
         position = inp.tell()
         line = inp.readline()
