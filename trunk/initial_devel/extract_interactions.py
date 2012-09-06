@@ -11,7 +11,7 @@ from bz2 import BZ2File
 
 import settings
 
-extract_taxids = [8090, 9606, 9031]
+extract_taxids = [9913, 10090] #[8090, 9606, 9031]
 
 ## we assume that the entries in the links-flatfile are in increasing order by the id, so we merely sort the list:
 extract_taxids.sort()
@@ -22,17 +22,19 @@ with open(settings.links_idx_fn, 'rb') as inp:
 ## Quick test that all taxids are found in the indexing:
 all_there = [organisms[t] for t in extract_taxids]
 
-inp = BZ2File(settings.links_fn_bz2)
-i = 0
-if True:
-#with BZ2File(settings.links_fn_bz2) as inp:
+#inp = BZ2File(settings.links_fn_bz2)
+#if True:
+with BZ2File(settings.links_fn_bz2) as inp:
   for taxid in extract_taxids:
+    print('Working on', taxid)
     out = open(settings.links_tbl_tpl.format(taxid), 'w') 
     inp.seek(organisms[taxid], 0)
-    stax = '{}.'.format(taxid).encode()
+    stax = '{}.'.format(taxid)
     while True:
-      ens1, ens2, score = inp.readline().split(b' ')
+      ens1, ens2, score = inp.readline().decode().split(' ')
       if not ens1.startswith(stax):
         break
       print(ens1[len(stax):], ens2[len(stax):], score, end='', sep=' ', file=out)  # score is suffixed with newline.
-    
+    out.close()
+
+settings.print_time('Script stopped')

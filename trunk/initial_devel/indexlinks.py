@@ -81,29 +81,5 @@ print('Stopped at position',position,'after',round((time.clock()-start)/60.0, 2)
 with open(settings.links_idx_fn, 'wb') as out:
   pickle.dump(organisms, out, protocol=2)
 
-#organism_ids = [int(i) for i in organisms.keys()]
-#organism_ids.sort()
-
-# Get relevant taxom ID's 
-#zz = ZipFile(settings.taxdmp_fn)
-#inp = zz.open('names.dmp')
-#out = sys.stdout
-#organism_ids = [1,2,3,4,8]
-#inp = zz.open('names.dmp')
-#if True:
-#with ZipFile(settings.taxdmp_fn) as zz, zz.open('names.dmp') as inp, open(settings.links_ind_fn, 'w') as out:
-  #i = 0
-  #for line in inp:
-    #tid, tname, rest = ( s.strip() for s in line.split(b'|', 2) )
-    #tid = int(tid)
-    #if tid != organism_ids[i]:
-      #while organism_ids[i] < tid:
-        #i += 1
-        #if i == len(organism_ids):
-          #break
-    #if i == len(organism_ids):
-      #break
-    #if tid == organism_ids[i]:
-      #print(tid, tname, organisms[str(tid).encode()], sep='\t', end='\n', file=out)
-    
-      
+# I considered placing the binary and tabular index in a zip file, kinda fancy,
+# but the tabular file would be corrupted if the zip-file was not closed properly.
