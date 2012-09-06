@@ -50,8 +50,9 @@ cur.executemany('INSERT INTO `meta` (`meta`, `value`) VALUES (?, ?);', \
             [('Created',time.strftime('%a %b %d %H:%M:%S %Y')), \
              ('STRING-db', settings.STRING_version),
              ('Primary encoding',settings.taxonomies[taxid]['primary encoding']),
-             (settings.taxonomies[taxid]['primary encoding'],1),
-             (settings.taxonomies[taxid]['primary encoding']+'_tbl','ppi')])
+             (settings.taxonomies[taxid]['primary encoding'],'ppi'),
+             ('Primary PPI','ppi') ])
+
 conn.commit()
 
 # Enter ppi data.
@@ -102,8 +103,7 @@ with open(settings.R_package_path.join(settings.taxonomies[taxid]['bioc'],'DESCR
   vers = re.findall('^Version: (.*)$', desc, re.MULTILINE)
   built = re.findall('^Built: (.*)$', desc, re.MULTILINE)
 
-cur.execute('INSERT INTO `meta` (`meta`, `value`) VALUES (?, ?);', ('entrez',1))
-cur.execute('INSERT INTO `meta` (`meta`, `value`) VALUES (?, ?);', ('entrez_tbl','entrez_ppi'))
+cur.execute('INSERT INTO `meta` (`meta`, `value`) VALUES (?, ?);', ('entrez','entrez_ppi'))
 cur.execute('INSERT INTO `meta` (`meta`, `value`) VALUES (?, ?);', ('ens2entrez',settings.taxonomies[taxid]['bioc']))
 cur.execute('INSERT INTO `meta` (`meta`, `value`) VALUES (?, ?);', ('ens2entrez_version',vers))
 cur.execute('INSERT INTO `meta` (`meta`, `value`) VALUES (?, ?);', ('ens2entrez_built',built))  
