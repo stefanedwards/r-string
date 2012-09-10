@@ -9,7 +9,7 @@ ppi.f.opener <- function(fn) gzfile(fn, open='r')
 
 #taxonomies <- c(882, 883) # c(9913,9606,10090)
 taxonomies <- c(9606, 9913, 10090)
-taxonomies <- c(882,1140)
+#taxonomies <- c(882,1140)
 
 
 # read ppi-file and report line numbers
