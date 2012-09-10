@@ -83,7 +83,7 @@ if (!has.index) {
     n.taxo <- nchar(as.character(taxo))
     taxo.ids <- substr(ppi$id1, 1, n.taxo)
     ppi <- ppi[taxo.ids == as.character(taxo),]
-    tmp <- cbind(substr(ppi$id1, n.taxo, 300), substr(ppi$id2, n.taxo, 300), ppi$score)
+    tmp <- cbind(substr(ppi$id1, n.taxo+2, 300), substr(ppi$id2, n.taxo+2, 300), ppi$score)
 
     write.table(tmp,  paste(ppi.fn.base, taxo, 'txt', sep='.'), quote=FALSE, sep='\t', row.names=FALSE, col.names=FALSE)
 
