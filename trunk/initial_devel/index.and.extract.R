@@ -1,6 +1,6 @@
 #!/opt/ghpc/bin/Rscript --vanilla
 
-setwd(Sys.getenv('PBS_O_WORKDIR'), '.')
+setwd(Sys.getenv('PBS_O_WORKDIR', '.'))
 
 
 ppi.fn.base <- 'protein.links.v9.0'
