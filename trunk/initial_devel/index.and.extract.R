@@ -1,11 +1,16 @@
+#!/opt/ghpc/bin/Rscript --vanilla
+
+setwd(Sys.getenv('PBS_O_WORKDIR'), '.')
 
 
 ppi.fn.base <- 'protein.links.v9.0'
-ppi.fn <- paste(ppi.fn.base, 'txt.bz2', sep='.')
-ppi.f.opener <- function(fn) bzfile(fn, open='r')
+ppi.fn <- paste(ppi.fn.base, 'txt.gz', sep='.')
+ppi.f.opener <- function(fn) gzfile(fn, open='r')
 
 #taxonomies <- c(882, 883) # c(9913,9606,10090)
+taxonomies <- c(9606, 9913, 10090)
 taxonomies <- c(882,1140)
+
 
 # read ppi-file and report line numbers
 ppi.index.fn <- paste(ppi.fn.base, 'index', sep='.')
@@ -33,10 +38,17 @@ if (!has.index) {
       }
       
       if (taxo %in% taxonomies) {
-        f <- file(paste(ppi.fn.base, taxo, 'txt', sep='.'), open='at')
-        writeLines(input[j:(j+taxo.counts[taxo]-1)], f)
-        print(paste(input[j], input[j+taxo.counts[taxo]-1], sep=' -- '))
-        close(f)
+        n.taxo <- nchar(as.character(taxo))        
+        columns <- strsplit(input[j:(j+taxo.counts[taxo]-1)], ' ', fixed=TRUE)
+        columns <- do.call(rbind, lapply(columns, function(x) 
+          c(substr(x[1], n.taxo+2, 300), substr(x[2], n.taxo+2, 300), x[3]))
+        )
+        
+        write.table(columns, paste(ppi.fn.base, taxo, 'txt', sep='.'), append=TRUE, row.names=FALSE, col.names=FALSE, quote=FALSE, sep=' ')
+        #f <- file(paste(ppi.fn.base, taxo, 'txt', sep='.'), open='at')
+        #writeLines(input[j:(j+taxo.counts[taxo]-1)], f)
+        #print(paste(input[j], input[j+taxo.counts[taxo]-1], sep=' -- '))
+        #close(f)
       }
 
       line.no <- line.no + taxo.counts[taxo]
