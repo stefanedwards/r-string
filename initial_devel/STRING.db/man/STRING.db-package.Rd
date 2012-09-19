@@ -27,11 +27,11 @@ ppi <- data.frame(id1=c(rep(1, 3), rep(2, 2), rep(3,3), rep(4,2)), id2=c(2,3,4, 
 dbWriteTable(conn, 'ppi', ppi, row.names=FALSE, overwrite=TRUE)
 
 ## Example of fetching meta data. ##
-.getMeta(conn, '\%')
-.getMeta(conn, 'name')
+STRING.db:::.getMeta(conn, '\%')
+STRING.db:::.getMeta(conn, 'name')
 
 ## Example of retrieving PPI data. ##
-.getPPI(conn, 'a', cutoff=0, encoding='ensembl', as.list=FALSE, simplify=FALSE)  # Here, we are cheating with the encoding...
+STRING.db:::.getPPI(conn, 'a', cutoff=0, encoding='ensembl', as.list=FALSE, simplify=FALSE)  # Here, we are cheating with the encoding...
 
 dbDisconnect(conn)
 }

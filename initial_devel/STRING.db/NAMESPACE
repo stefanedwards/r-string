@@ -1,4 +1,0 @@
-export(.getMeta)
-export(.getNames)
-export(.getPPI)
-export(.known.encodings)
