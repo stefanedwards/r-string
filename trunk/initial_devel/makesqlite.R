@@ -2,12 +2,13 @@
 #PBS -j oe
 
 options(stringsAsFactors=FALSE)
+print(date())
 
 library(RSQLite)
 library(AnnotationFuncs)
 drv <- dbDriver('SQLite')
 
-setwd(Sys.getenv('PBS_O_WORKDIR'), '.')  # for the sake of qsub
+setwd(Sys.getenv('PBS_O_WORKDIR', '.'))  # for the sake of qsub
 
 source('settings.R')
 
@@ -29,25 +30,38 @@ ppi.mask <- ppi
 ppi.mask$id1 <- prot.ids[ppi.mask$id1]
 ppi.mask$id2 <- prot.ids[ppi.mask$id2]
 
+unlink(sprintf(string.db.fn, string.fn.base, taxo))
 conn <- dbConnect(drv, sprintf(string.db.fn, string.fn.base, taxo))
-dbWriteTable(conn, 'ppi', ppi.mask, row.names=FALSE,overwrite=TRUE)
-dbSendQuery(conn, 'CREATE INDEX `IDX_ppi_id1` ON `ppi` (`id1`);')
-dbSendQuery(conn, 'CREATE UNIQUE INDEX `IDX_ppi` ON `ppi` (`id1`,`id2`);')
-dbSendQuery(conn, 'CREATE INDEX `IDX_ppi_score` ON `ppi` (`score`);')
+null <- dbWriteTable(conn, 'ppi', ppi.mask, row.names=FALSE,overwrite=TRUE)
+null <- dbSendQuery(conn, 'CREATE INDEX `IDX_ppi_id1` ON `ppi` (`id1`);')
+null <- dbSendQuery(conn, 'CREATE UNIQUE INDEX `IDX_ppi` ON `ppi` (`id1`,`id2`);')
+null <- dbSendQuery(conn, 'CREATE INDEX `IDX_ppi_score` ON `ppi` (`score`);')
 
-dbSendQuery(conn, 'CREATE TABLE `geneid` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `gene` TEXT UNIQUE);')
-dbWriteTable(conn, 'geneids', prot.mat, row.names=FALSE, overwrite=FALSE, append=TRUE)
+null <- dbSendQuery(conn, 'CREATE TABLE `geneids` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `gene` TEXT UNIQUE);')
+null <- dbWriteTable(conn, 'geneids', prot.mat, row.names=FALSE, overwrite=FALSE, append=TRUE)
 
-dbSendQuery(conn, 'CREATE TABLE `meta` (`meta` TEXT, `value` TEXT);')
-dbSendQuery(conn, 'CREATE INDEX `IDX_meta` ON `meta` (`meta`);')
+null <- dbSendQuery(conn, 'CREATE TABLE `meta` (`meta` TEXT, `value` TEXT);')
+null <- dbSendQuery(conn, 'CREATE INDEX `IDX_meta` ON `meta` (`meta`);')
 
 ## Insert meta data
+meta <- c('Created',date(),
+          'STRING-db', string.version,
+          'Primary PPI','ppi')
+null <- dbWriteTable(conn, 'meta', as.data.frame(matrix(meta, ncol=2, byrow=TRUE)), row.names=FALSE, overwrite=FALSE, append=TRUE)
+
+null <- sapply(dbListResults(conn), dbClearResult)
+
+print('Loading entrez.')
 
 org.settings <- organisms[[taxo]]
 if (!is.null(org.settings)) {
+  meta <- c('Primary encoding', org.settings$primary, 
+            org.settings$primary, 'ppi')  # maps `ensembl` to ppi.
+
   if (org.settings$has.entrez == TRUE & !is.null(org.settings$db) & !is.null(org.settings$ens2eg)) {
-    dbSendQuery(conn, 'CREATE TABLE `entrez_ppi` (`id1` INTEGER NOT NULL, `id2` INTEGER NOT NULL, `score` INTEGER NOT NULL); ')
     require(org.settings$db, character.only=TRUE)
+    dbSendQuery(conn, 'CREATE TABLE `entrez_ppi` (`id1` INTEGER NOT NULL, `id2` INTEGER NOT NULL, `score` INTEGER NOT NULL); ')
+    
     ens2ent <- AnnotationFuncs::translate(prot.mat$gene, get(org.settings$ens2eg), return.list=FALSE)
     ens2ent$from <- as.character(ens2ent$from)
     ens2ent$to <- as.integer(ens2ent$to)
@@ -64,5 +78,13 @@ if (!is.null(org.settings)) {
     dbWriteTable(conn, 'entrez_ppi', ppi.entrez, row.names=FALSE, overwrite=FALSE, append=TRUE)
     dbSendQuery(conn, 'CREATE INDEX `IDX_entrez_ppi_id1` ON `entrez_ppi` (`id1`); ')
     dbSendQuery(conn, 'CREATE INDEX `IDX_entrez_ppi_score` ON `entrez_ppi` (`score`);')
+    
+    meta <- c(meta,
+              'entrez', 'entrez_ppi',
+              'entrez version', read.dcf(system.file('DESCRIPTION',package=org.settings$db), 'Version')
+              )
   }
+  dbWriteTable(conn, 'meta', as.data.frame(matrix(meta, ncol=2, byrow=TRUE)), row.names=FALSE, overwrite=FALSE, append=TRUE)
 }
+
+print(paste('Done.', date()))
