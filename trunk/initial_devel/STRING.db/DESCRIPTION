@@ -1,0 +1,15 @@
+Package: STRING.db
+Maintainer: Stefan McKinnon Edwards <stefan.hoj-edwards@agrsci.dk>
+License: GPL-2
+BugReports: 
+Title: STRING.db database interface
+Author: Stefan McKinnon Edwards <stefan.hoj-edwards@agrsci.dk>
+Description: Interface package for organism protein-protein-interaction data
+    packages from STRING-db.org.
+Version: 0.1.0
+biocViews: AnnotationData, Software
+URL: http://code.google.com/p/r-string/
+Date: 2012-09-19
+Depends: R (>= 2.7.0), RSQLite, BiocGenerics
+Suggests:
+Collate: 'zzz.R'
