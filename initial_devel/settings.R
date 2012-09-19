@@ -9,8 +9,8 @@ string.db.fn <- '%s.%s.sqlite3'
 
 ## settings for organisms
 organisms <- list()
-organisms$'9913' <- list(short='Bt', db='org.Bt.eg.db', conn='org.Bt.eg_dbconn', ens2eg='org.Bt.egENSEMBLPROT2EG', has.entrez=TRUE)
-organisms$'9606' <- list(short='Hs', db='org.Hs.eg.db', conn='org.Hs.eg_dbconn', ens2eg='org.Hs.egENSEMBLPROT2EG',has.entrez=TRUE)
+organisms$'9913' <- list(short='Bt', primary='ensembl', db='org.Bt.eg.db', db_conn='org.Bt.eg_dbconn', ens2eg='org.Bt.egENSEMBLPROT2EG', has.entrez=TRUE)
+organisms$'9606' <- list(short='Hs', primary='ensembl', db='org.Hs.eg.db', db_conn='org.Hs.eg_dbconn', ens2eg='org.Hs.egENSEMBLPROT2EG', has.entrez=TRUE)
 
 
 # some auxillary functions  

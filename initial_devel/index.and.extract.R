@@ -44,7 +44,7 @@ if (!has.index) {
           c(substr(x[1], n.taxo+2, 300), substr(x[2], n.taxo+2, 300), x[3]))
         )
         
-        write.table(columns, paste(ppi.fn.base, taxo, 'txt', sep='.'), append=TRUE, row.names=FALSE, col.names=FALSE, quote=FALSE, sep=' ')
+        write.table(columns, paste(ppi.fn.base, taxo, 'tab', sep='.'), append=TRUE, row.names=FALSE, col.names=FALSE, quote=FALSE, sep=' ')
         #f <- file(paste(ppi.fn.base, taxo, 'txt', sep='.'), open='at')
         #writeLines(input[j:(j+taxo.counts[taxo]-1)], f)
         #print(paste(input[j], input[j+taxo.counts[taxo]-1], sep=' -- '))
@@ -85,7 +85,7 @@ if (!has.index) {
     ppi <- ppi[taxo.ids == as.character(taxo),]
     tmp <- cbind(substr(ppi$id1, n.taxo+2, 300), substr(ppi$id2, n.taxo+2, 300), ppi$score)
 
-    write.table(tmp,  paste(ppi.fn.base, taxo, 'txt', sep='.'), quote=FALSE, sep='\t', row.names=FALSE, col.names=FALSE)
+    write.table(tmp,  paste(ppi.fn.base, taxo, 'tab', sep='.'), quote=FALSE, sep='\t', row.names=FALSE, col.names=FALSE)
 
   }
   close(ppi.f)
