@@ -51,6 +51,10 @@ null <- dbWriteTable(conn, 'meta', as.data.frame(matrix(meta, ncol=2, byrow=TRUE
 
 null <- sapply(dbListResults(conn), dbClearResult)
 
+ppi.900 <- ppi[ppi$score >= 900,]
+STRING.Bt.900 <- split(ppi.900$id2, as.factor(ppi.900$id1))
+
+
 print('Loading entrez.')
 
 org.settings <- organisms[[taxo]]
@@ -83,8 +87,14 @@ if (!is.null(org.settings)) {
               'entrez', 'entrez_ppi',
               'entrez version', read.dcf(system.file('DESCRIPTION',package=org.settings$db), 'Version')
               )
+    
+    ppi.entrez.900 <- ppi.entrez[ppi.entrez$score >= 900,]
+    STRING.Bt.eg.900 <- split(ppi.entrez.900$id2, as.factor(ppi.entrez.900$id1))
   }
   dbWriteTable(conn, 'meta', as.data.frame(matrix(meta, ncol=2, byrow=TRUE)), row.names=FALSE, overwrite=FALSE, append=TRUE)
 }
 
-print(paste('Done.', date()))
+print(paste('Done building db', date()))
+caches <- c('STRING.Bt.900', 'STRING.Bt.eg.900')
+caches <- caches[caches %in% ls()]
+save(list=caches , file='protein.links.v9.0.9913.Rdata')
