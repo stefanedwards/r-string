@@ -1,0 +1,14 @@
+Package: STRING.Bt.db
+Maintainer: Stefan McKinnon Edwards <stefan.hoj-edwards@agrsci.dk>
+License: GPL-2
+BugReports: 
+Title: Protein-protein interaction data package for Bos taurus.
+Author: Stefan McKinnon Edwards <stefan.hoj-edwards@agrsci.dk>
+Description: Cached data from STRING-db.org v. 9.0 for Bos taurus.
+Version: 0.1.0
+biocViews: AnnotationData, Software
+URL: http://code.google.com/p/r-string/
+Date: 2012-09-19
+Depends: R (>= 2.7.0), RSQLite, BiocGenerics, STRING.db
+Suggests:
+Collate: 'zzz.R'
