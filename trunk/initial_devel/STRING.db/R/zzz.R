@@ -55,7 +55,6 @@ library(RSQLite)
 #' @author Stefan McKinnon Edwards \email{stefan.hoj-edwards@@agrsci.dk}
 #' @name getMeta
 #' @aliases .getMeta
-#' @export .getMeta
 #' @seealso \code{\link{STRING.db}}
 .getMeta <- function(conn, key='%') {
   #dbReadTable(conn, 'meta')
@@ -81,7 +80,6 @@ library(RSQLite)
 #' @author Stefan McKinnon Edwards \email{stefan.hoj-edwards@@agrsci.dk}
 #' @name getPPI
 #' @aliases .getPPI
-#' @export  .getPPI
 #' @seealso \code{\link{known.encodings}}, \code{\link{STRING.db}}
 .getPPI <- function(conn, proteins, cutoff, encoding, as.list, simplify) {
   encoding <- tolower(encoding)
@@ -117,7 +115,6 @@ library(RSQLite)
 #' @return data.frame with one column.
 #' @name getNames
 #' @aliases .getNames
-#' @export .getNames
 .getNames <- function(conn, filter=NULL) {
   if (is.null(filter)) {
     return(dbReadTable(conn, 'geneids', row.names='id'))
