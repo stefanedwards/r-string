@@ -9,6 +9,7 @@ Version: 0.1.0
 biocViews: AnnotationData, Software
 URL: http://code.google.com/p/r-string/
 Date: 2012-09-19
-Depends: R (>= 2.7.0), RSQLite, BiocGenerics, STRING.db
-Suggests:
-Collate: 'zzz.R'
+Depends: R (>= 2.7.0)
+Suggests: 
+Imports: RSQLite
+Collate: 'STRING.db.R'  'func.R'
