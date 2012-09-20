@@ -95,6 +95,9 @@ if (!is.null(org.settings)) {
 }
 
 print(paste('Done building db', date()))
+
+## Create files for package...
+
 caches <- c('STRING.Bt.900', 'STRING.Bt.eg.900')
 caches <- caches[caches %in% ls()]
 save(list=caches , file='protein.links.v9.0.9913.Rdata')
