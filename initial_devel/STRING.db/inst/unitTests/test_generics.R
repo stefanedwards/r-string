@@ -14,12 +14,12 @@ test_interface <- function() {
   ## Start testing
   res <- list(bla=c('chezburger','rainbow'), dude='greg', ensembl='ppi', name='lolcat', `Primary encoding`='ensembl', `Primary PPI`='ppi')  # order of these are important.
   #checkEquals(.getMeta(conn), res, msg='Checks return of all meta data.', check.names=FALSE, check.attributes=FALSE)
-  current <- .getMeta(conn)
+  current <- STRING.db:::.getMeta(conn)
   for (n in names(res)) {
     checkEquals(current[n], res[n])
   }
   
-  checkEquals(.getMeta(conn, 'name'), res$name, msg='Checks return of `name` key from meta data.')
+  checkEquals(STRING.db:::.getMeta(conn, 'name'), res$name, msg='Checks return of `name` key from meta data.')
   
   
   ### Test PPI
@@ -32,7 +32,7 @@ test_interface <- function() {
 
   ## Start testing
   #checkEquals(.getPPI(conn, proteins=c('a','b','c'), cutoff=900, encoding='ensembl', as.list=TRUE, simplify=FALSE), list(a=c('b','c'), b=c('a','c'), c=c('a','b')))
-  current <- .getPPI(conn, proteins=c('a','b','c'), cutoff=900, encoding='ensembl', as.list=TRUE, simplify=FALSE)
+  current <- STRING.db:::.getPPI(conn, proteins=c('a','b','c'), cutoff=900, encoding='ensembl', as.list=TRUE, simplify=FALSE)
   res <- list(a=c('b','c'), b=c('a','c'), c=c('a','b'))
   for (n in names(res)) {
     checkEquals(current[n], res[n])
@@ -42,12 +42,12 @@ test_interface <- function() {
   res <- structure(ppi[ppi$score >= 900,], .Names=c('g1','g2','score'))
   res$g1 <- with(res, geneid$gene[g1])
   res$g2 <- with(res, geneid$gene[g2])  
-  checkEquals(.getPPI(conn, proteins=c('a','b','c'), cutoff=900, encoding='ensembl', as.list=FALSE, simplify=FALSE), res, check.attributes=FALSE)
+  checkEquals(STRING.db:::.getPPI(conn, proteins=c('a','b','c'), cutoff=900, encoding='ensembl', as.list=FALSE, simplify=FALSE), res, check.attributes=FALSE)
   
-  checkEquals(.getPPI(conn, proteins=c('a','b','c'), cutoff=900, encoding='ensembl', as.list=FALSE, simplify=TRUE), c('b','c','a'))
+  checkEquals(STRING.db:::.getPPI(conn, proteins=c('a','b','c'), cutoff=900, encoding='ensembl', as.list=FALSE, simplify=TRUE), c('b','c','a'))
   
-  checkEquals(.getNames(conn), data.frame(gene=c('a','b','c','d')), check.attributes=FALSE)
-  checkEquals(.getNames(conn, 'a%'), data.frame(gene='a'))
+  checkEquals(STRING.db:::.getNames(conn), data.frame(gene=c('a','b','c','d')), check.attributes=FALSE)
+  checkEquals(STRING.db:::.getNames(conn, 'a%'), data.frame(gene='a'))
   
   dbDisconnect(conn)
 } 
