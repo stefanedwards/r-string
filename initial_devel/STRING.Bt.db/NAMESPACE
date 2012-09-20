@@ -1,0 +1,2 @@
+export(STRING.Bt.Meta, STRING.Bt.PPI)
+export(STRING.Bt_dbconn, STRING.Bt_dbfile, STRING.Bt_organism)
