@@ -1,59 +1,71 @@
-#settings
+#############################
+## Settings for filenames and urls
+#############################
 
-
-#' Formats version numbers to include one digit.
+#' Auxiliary function: Formats version numbers to include one digit.
 #' 
 #' @return String, rounded to 1 digit.
+#' @export
 fmt.v <- function(d) sprintf('%.1f', d)
 
+#' Auxiliary functions: Opens any file as connection
+#' 
+#' Determines based on extension, whether the file should be 
+#' opened with \code{file}, \code{gzfile} or \code{bzfile}.
+#' @param fn Filename
+#' @param open Mode for opening file (r, w, rb, etc.). Defaults to 'r'.
+#' @return Connection to file.
+opener <- function(fn, open='r', ...) {
+  if (substr(string.fn, nchar(string.fn)-2, 40) == '.gz') 
+    return(gzfile(fn, open=open, ...))
+  if (substr(string.fn, nchar(string.fn)-2, 40) == 'bz2')
+    return(bzfile(fn, open=open, ...))
+  return(file(fn, open=open, ...))
+}
 
-#string.version <- 9.0
-# define string templates to use with sprintf.
-#string.fn <- 'protein.links.v%.1f.txt.gz'
-#string.url <- 'http://string-db.org/newstring_download/%s'
-string.tax.fn <- '%s.%s.tab'  # {protein.links.v.9.0}.{9606}.tab'
 string.db.fn <- '%s.%s.sqlite3'
 
 
-#' Settings for downloading data from STRING website
+#' Settings for downloading data from STRING website.
 #' 
-#' String templates are resolved using \code{sprintf}.
-www.settings <- list(
-  `9.0`=list(url='http://string-db.org/newstring_download/%s', fn='protein.links.v%.1f.txt.gz')
-  )
-www.settings <- function(version) 
+#' Returns filenames and urls for download flatfile and for indexes and such.
+#' @param version Numeric value of STRING version.
+#' @return List with six elements:
+#'   \describe{
+#'     \item{\code{url}}{Full url for downloading filename.}
+#'     \item{\code{fn}}{Basename of url.}
+#'     \item{\code{fn.base}}{ Basename of file, excluding .txt.gz extension.}
+#'     \item{\code{index.fn}}{Filename of text-index.}
+#'     \item{\code{idx.fn}}{Filename of binary (.RData) index.}
+#'     \item{\code{org.fn}}{Function that returns filename for organism data rom flatfile. Requires one argument.}
+#'   }
+#' @export
+www.settings <- function(version) {
   v <- fmt.v(version)
-
-  if (is.null(w.s)) stop(paste('Could resolve urls and filenames for STRING version', v, '.', sep=''))
 
   res <- list()
 
   if (version == 9) {
-    res$url <- 'http://string-db.org/newstring_download/%s' 
+    res$url <- 'http://string-db.org/newstring_download' 
   }
   if (version > 8) {
-    res$fn <- sprintf('protein.links.v%.1f.txt.gz', version)
+    fn.base <- sprintf('protein.links.v%.1f', version)
+    res$fn.base
+    res$fn <- paste(fn.base, '.txt.gz', sep='')
   }
-  if (length(res) != 2) stop(paste('Could resolve urls and filenames for STRING version', v, '.', sep=''))
+
+  res$url <- paste(res$url, res$fn, sep='/')
+  res$index.fn <- paste(res$fn.base, 'index', sep='.')
+  res$idx.fn <- paste(res$fn.base, 'idx', sep='.')
+
+  res$org.fn <- function(tax.id) paste(fn.base, tax.id, 'tab', sep='.')
+
+
+  if (length(res) != 6) stop(paste('Could resolve urls and filenames for STRING version', v, '.', sep=''))
 
   return(res)
 }
 
-#############################
-## Organism specific settings
-#############################
-organisms <- list()
-organisms$'9913' <- list(short='Bt', long='Bos taurus', primary='ensembl', map2entrez=make.ens2eg('org.Bt.eg.db','org.Bt.egENSEMBLPROT2EG'))
-organisms$'9913' <- list(short='Hs', long='Homo sapiens', primary='ensembl', map2entrez=make.ens2eg('org.Hs.eg.db','org.Hs.egENSEMBLPROT2EG'))
-
-fpaste <- function(...) paste(..., sep='.')
-
-## automatic rewriting variables
-#string.fn <- sprintf(string.fn, string.version)
-#string.url <- sprintf(string.url, string.fn)
-#string.fn.base <- sub('\\.txt\\.(gz|bz2)','',string.fn)
-
-#string.index.fn <- fpaste(string.fn.base, 'index')
 
 #' Function for mapping ensembl to entrez
 #' 
@@ -87,12 +99,15 @@ ens2eg <- function(ppi, db, obj) {
   names(ppi.entrez)[names(ppi.entrez) == 'to'] <- 'id2'
   
   attr(ppi.entrez, 'meta') <- data.frame(meta='entrez version', value=read.dcf(system.file('DESCRIPTION',package=org.settings$db), 'Version'))
-    
+  
   options(stringAsFactors=.stringAsFactors)
   return(ppi.entrez)
 }
-#' @rdname ens2eg
-#' @inheritParams ens2eg
-make.ens2eg <- function(db, obj) {
-  return(function(ppi) ens2eg(ppi, db, obj))
-}
+# #' @rdname ens2eg
+# #' @inheritParams ens2eg
+# #' @return \code{make.ens2eg} returns function alike \code{ens2eg} that is setup for specific db and obj.
+#make.ens2eg <- function(db, obj) {
+#  return(function(ppi) ens2eg(ppi, db, obj))
+#}
+
+
