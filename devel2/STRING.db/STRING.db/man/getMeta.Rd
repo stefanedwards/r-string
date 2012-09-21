@@ -20,10 +20,6 @@
   Generic function for retrieving meta-data from organism
   data packages.
 }
-\author{
-  Stefan McKinnon Edwards
-  \email{stefan.hoj-edwards@agrsci.dk}
-}
 \seealso{
   \code{\link{STRING.db}}
 }

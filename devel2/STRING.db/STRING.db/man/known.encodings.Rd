@@ -8,8 +8,8 @@
 }
 \description{
   In these packages, we call the type of identifier for an
-  biological entity `encodings'. E.g. Entrez, Ensembl or
-  Refseq are examples of encodings.
+  biological entity \sQuote{encodings}. E.g. Entrez,
+  Ensembl or Refseq are examples of encodings.
 }
 \keyword{datasets}
 

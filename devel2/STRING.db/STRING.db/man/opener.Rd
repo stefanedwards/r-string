@@ -9,6 +9,9 @@
 
   \item{open}{Mode for opening file (r, w, rb, etc.).
   Defaults to 'r'.}
+
+  \item{...}{Additional arguments passed to \code{file},
+  \code{gzfile} or \code{bzfile}.}
 }
 \value{
   Connection to file.

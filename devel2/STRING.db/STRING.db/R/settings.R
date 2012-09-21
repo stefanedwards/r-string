@@ -4,6 +4,7 @@
 
 #' Auxiliary function: Formats version numbers to include one digit.
 #' 
+#' @param d Integer/numeric value to format.
 #' @return String, rounded to 1 digit.
 #' @export
 fmt.v <- function(d) sprintf('%.1f', d)
@@ -14,11 +15,12 @@ fmt.v <- function(d) sprintf('%.1f', d)
 #' opened with \code{file}, \code{gzfile} or \code{bzfile}.
 #' @param fn Filename
 #' @param open Mode for opening file (r, w, rb, etc.). Defaults to 'r'.
+#' @param ... Additional arguments passed to \code{file}, \code{gzfile} or \code{bzfile}.
 #' @return Connection to file.
 opener <- function(fn, open='r', ...) {
-  if (substr(string.fn, nchar(string.fn)-2, 40) == '.gz') 
+  if (substr(fn, nchar(fn)-2, 40) == '.gz') 
     return(gzfile(fn, open=open, ...))
-  if (substr(string.fn, nchar(string.fn)-2, 40) == 'bz2')
+  if (substr(fn, nchar(fn)-2, 40) == 'bz2')
     return(bzfile(fn, open=open, ...))
   return(file(fn, open=open, ...))
 }
@@ -80,9 +82,9 @@ www.settings <- function(version) {
 #' @return New data.frame with same names and type, but with the two first columns replaced with entrez identifiers.
 #' @author  Stefan McKinnon Edwards  \email{stefan.hoj-edwards@@agrsci.dk}
 ens2eg <- function(ppi, db, obj) {
-  .stringAsFactors <- getOption(stringAsFactors)
+  .stringAsFactors <- getOption('stringAsFactors')
   options(stringAsFactors=FALSE)
-  require(AnnorationFuncs)
+  require(AnnotationFuncs)
   require(db, character.only=TRUE)
   
   ens2ent <- AnnotationFuncs::translate(ppi[,1:2], get(obj), return.list=FALSE)
@@ -98,7 +100,8 @@ ens2eg <- function(ppi, db, obj) {
   ppi.entrez$id2 <- NULL # 5702 5871
   names(ppi.entrez)[names(ppi.entrez) == 'to'] <- 'id2'
   
-  attr(ppi.entrez, 'meta') <- data.frame(meta='entrez version', value=read.dcf(system.file('DESCRIPTION',package=org.settings$db), 'Version'))
+  attr(ppi.entrez, 'meta') <- data.frame(meta=c('entrez version','entrez source'), 
+                                         value=c(read.dcf(system.file('DESCRIPTION',package=db), 'Version'), db) )
   
   options(stringAsFactors=.stringAsFactors)
   return(ppi.entrez)
