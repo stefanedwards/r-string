@@ -1,3 +1,5 @@
 export(fmt.v)
+export(getNames)
+export(getPPI)
 export(index.flatfile)
 export(www.settings)

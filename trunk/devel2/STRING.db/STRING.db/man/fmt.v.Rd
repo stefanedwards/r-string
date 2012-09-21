@@ -4,6 +4,9 @@
 \usage{
   fmt.v(d)
 }
+\arguments{
+  \item{d}{Integer/numeric value to format.}
+}
 \value{
   String, rounded to 1 digit.
 }

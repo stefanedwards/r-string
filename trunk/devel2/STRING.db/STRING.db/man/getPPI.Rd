@@ -15,8 +15,8 @@
   \item{cutoff}{Score cut-off; only retrieves ppi with
   scores larger than or equal to.}
 
-  \item{encoding}{Character vector of which encoding
-  \code{proteins} is set in.}
+  \item{encoding}{String of which encoding \code{proteins}
+  is set in.}
 
   \item{as.list}{Logical, restructure result to a list, see
   Value.}
@@ -43,6 +43,7 @@
   \email{stefan.hoj-edwards@agrsci.dk}
 }
 \seealso{
-  \code{\link{known.encodings}}, \code{\link{STRING.db}}
+  \code{\link{known.encodings}}, \code{\link{STRING.db}},
+  \code{\link{getNames}}
 }
 

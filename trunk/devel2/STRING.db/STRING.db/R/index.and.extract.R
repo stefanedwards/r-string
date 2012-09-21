@@ -25,8 +25,11 @@ download.flatfile <- function(version, destdir='.') {
 #'    If \code{NULL}, nothing is extracted.
 #' @param org.fn Filename function for making filenames for organism sections; 
 #'    recieves tax id as argument.
+#' @param idx.fn String with filename relative to dest dir for binary index.
+#' @param index.fn String with filename relative to dest dir for text index.
 #' @return List: \code{index} Integer vector with index of all tax ids, 
-#'    \code{found} Logical vector matching which tax ids in \code{taxonomies} were found.
+#'    \code{found} Logical vector matching which tax ids in \code{taxonomies} were found
+#'    and \code{fn} Character vector of paths to organism flatfiles.
 #' @section Side effects: 
 #'    Will create a new file in \code{destdir} for each found tax id in \code{taxonomies},
 #'    as well as two index-files (binary and ordinary .RData-type, but with .idx extension.)
@@ -45,9 +48,13 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
   if (!is.null(taxonomies)) taxonomies <- as.character(sort(as.integer(taxonomies)))
   
   ## Re-path filenames
-  fn <- file.path(destdir, fn)
-  idx.fn <- file.path(destdir, idx.fn)
-  index.fn <- file.path(destdir, index.fn)
+  # Ugly hack because I cannot seem to determine whether a path is absolute...
+  prev.wd <- setwd(destdir)
+  fn <- normalizePath(fn)
+  idx.fn <- normalizePath(idx.fn, mustWork=FALSE)
+  index.fn <- normalizePath(index.fn, mustWork=FALSE)
+  taxo.fn <- sapply(taxonomies, function(x) normalizePath(org.fn(x), mustWork=FALSE))
+  setwd(prev.wd)
   
   ## Open connections for input file and index file.
   ppi.f <- opener(fn)
@@ -59,9 +66,10 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
   null <- readLines(ppi.f, n=1)
   idx <- vector('character')
   found.tax <- structure(rep(FALSE, length(taxonomies)), .Names=taxonomies)
+
   # Main loop for reading
   while (length(input <- readLines(ppi.f, n=60000)) > 0) {
-    tax.ids <- substr(input, 1, regexpr('.', input, fixed=TRUE)-1)  # Extract tax.ids
+    taxo.ids <- substr(input, 1, regexpr('.', input, fixed=TRUE)-1)  # Extract tax.ids
     taxos <- unique(taxo.ids)
     taxo.counts <- table(taxo.ids)
     
@@ -84,7 +92,7 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
           c(substr(x[1], n.taxo+2, 300), substr(x[2], n.taxo+2, 300), x[3]))
         )
         # Appends columns to organism file.
-        write.table(columns, file=file.path(destdir, org.fn(taxo)), append=TRUE, 
+        write.table(columns, file=taxo.fn[taxo], append=TRUE, 
                     row.names=FALSE, col.names=FALSE, quote=FALSE, sep='\t')
         # Make a note that we found the tax id.
         found.tax[taxo] <- TRUE
@@ -99,9 +107,9 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
   close(ppi.f)
   close(index.f)
   
-  save(idx, idx.fn)
+  save(idx, file=idx.fn)
   
-  return(list(index=idx, found=found.tax))
+  return(list(index=idx, found=found.tax, fn=taxo.fn))
 }
 
 #' Extracts organism sections from protein.links flatfile.

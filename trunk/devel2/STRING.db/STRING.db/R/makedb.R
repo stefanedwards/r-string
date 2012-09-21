@@ -26,12 +26,21 @@ make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL) {
   meta['primary'] <- organism$primary
   meta[organism$primary] <- '1'
   meta['Organism'] <- organism$long
+  meta['DB Schema'] <- 0.2 
+    ## 0.1 was on emphasis on primary encoding, e.g. geneids and ppi.
+    ## 0.2 is more flexible, as the table naming is dependant on encoding.
   
   # Read raw data
   ppi <- read.table(flatfile.fn, header=FALSE, col.names=c('id1','id2','score'), as.is=TRUE)
   write.ppi.table(conn, ppi, organism$primary)
   
-  #Todo: map to entrez?
+  if (!is.null(organism$ens2eg)) {
+    ppi.ens <- organism$ens2eg(ppi)
+    write.ppi.table(conn, ppi.ens, 'entrez')
+    meta['entrez'] <- '1'
+    if (!is.null(attr(ppi.ens, 'meta'))) 
+      dbWriteTable(conn, 'meta', attr(ppi.ens, 'meta'), append=TRUE, overwrite=FALSE, row.names=FALSE)
+  }
   
   ## Write meta table
   dbWriteTable(conn, 'meta', data.frame(key=names(meta), value=meta), append=TRUE, overwrite=FALSE, row.names=FALSE)
@@ -72,4 +81,10 @@ write.ppi.table <- function(conn, ppi, encoding) {
   dbSendQuery(conn, sprintf('CREATE INDEX `IDX_%s_id1` ON `%s` (`id1`);', encoding, encoding))
   #dbSendQuery(conn, 'CREATE UNIQUE INDEX `IDX_ppi` ON `ppi` (`id1`,`id2`);')
   dbSendQuery(conn, sprintf('CREATE INDEX `IDX_%s_score` ON `%s` (`score`);', encoding, encoding))
+}
+
+make.cache <- function(conn, encoding, cutoff) {
+  all.names <- getNames(conn, encoding)
+  res <- getPPI(conn, proteins=all.names, cutoff=cutoff, encoding=encoding, as.list=TRUE, simplify=FALSE)
+  return(res)
 }
