@@ -85,7 +85,7 @@ ens2eg <- function(ppi, db, obj) {
   .stringAsFactors <- getOption('stringAsFactors')
   options(stringAsFactors=FALSE)
   require(AnnotationFuncs)
-  require(db, character.only=TRUE)
+  if (!require(db, character.only=TRUE)) return(FALSE)
   
   ens2ent <- AnnotationFuncs::translate(ppi[,1:2], get(obj), return.list=FALSE)
   ens2ent$from <- as.character(ens2ent$from)
@@ -112,5 +112,4 @@ ens2eg <- function(ppi, db, obj) {
 #make.ens2eg <- function(db, obj) {
 #  return(function(ppi) ens2eg(ppi, db, obj))
 #}
-
 
