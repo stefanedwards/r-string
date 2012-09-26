@@ -6,7 +6,7 @@
   index.flatfile(fn, destdir = ".", taxonomies = NULL,
     org.fn = NULL, idx.fn = NULL, index.fn = NULL)
 
-  extract.flatfile(fn, destdir = ".", taxonomies = NULL,
+  extract.flatfile(fn, destdir = ".", taxonomies,
     org.fn = NULL, idx = NULL)
 }
 \arguments{
@@ -37,10 +37,15 @@
   is extracted and loaded.}
 }
 \value{
-  List: \code{index} Integer vector with index of all tax
-  ids, \code{found} Logical vector matching which tax ids
-  in \code{taxonomies} were found and \code{fn} Character
-  vector of paths to organism flatfiles.
+  \code{index.flatfile} - List: \code{index} Integer vector
+  with index of all tax ids, \code{found} Logical vector
+  matching which tax ids in \code{taxonomies} were found
+  and \code{fn} Character vector of absolute paths to
+  organism flatfiles.
+
+  \code{extract.flatfile} - List with elements \code{fn}
+  character vector of absolute paths to organism specific
+  flatfiles.
 }
 \description{
   Uses tax id in column 1 to distinguish new section and
