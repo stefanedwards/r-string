@@ -45,16 +45,15 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
   }
   stopifnot(!is.null(fn), !is.null(idx.fn), !is.null(index.fn), !(!is.null(taxonomies) & is.null(org.fn)) ) 
   
-  if (!is.null(taxonomies)) taxonomies <- as.character(sort(as.integer(taxonomies)))
-  
+  if (!is.null(taxonomies)) taxonomies <- taxonomies[order(as.integer(taxonomies))]
+
   ## Re-path filenames
-  # Ugly hack because I cannot seem to determine whether a path is absolute...
-  prev.wd <- setwd(destdir)
   fn <- normalizePath(fn)
-  idx.fn <- normalizePath(idx.fn, mustWork=FALSE)
-  index.fn <- normalizePath(index.fn, mustWork=FALSE)
-  taxo.fn <- sapply(taxonomies, function(x) normalizePath(org.fn(x), mustWork=FALSE))
-  setwd(prev.wd)
+  
+  dir.create(destdir, showWarnings=FALSE)
+  prev.wd <- setwd(destdir)
+  taxo.fn <- sapply(taxonomies, org.fn)
+
   
   ## Open connections for input file and index file.
   ppi.f <- opener(fn)
@@ -64,7 +63,7 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
   last.taxo <- ''
   line.no <- 1  # Total line count
   null <- readLines(ppi.f, n=1)
-  idx <- vector('character')
+  idx <- vector('integer')  # for binary dataset
   found.tax <- structure(rep(FALSE, length(taxonomies)), .Names=taxonomies)
 
   # Main loop for reading
@@ -85,7 +84,7 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
       
       if (taxo %in% taxonomies) {
         n.taxo <- nchar(as.character(taxo)) # Length of tax id string.
-        # Splits into list; 1 element per column (or is it 1 element per line?)
+        # Splits into list; 1 element per line
         columns <- strsplit(input[j:(j+taxo.counts[taxo]-1)], ' ', fixed=TRUE) 
         # Re-merges into character matrix after stripping tax id.
         columns <- do.call(rbind, lapply(columns, function(x) 
@@ -97,18 +96,20 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
         # Make a note that we found the tax id.
         found.tax[taxo] <- TRUE
       }
+      line.no <- line.no + taxo.counts[taxo]
+      j <- j + taxo.counts[taxo]
     }
     
-    line.no <- line.no + taxo.counts[taxo]
-    j <- j + taxo.counts[taxo]
   }
   
   # Clean up
   close(ppi.f)
   close(index.f)
+
   
   save(idx, file=idx.fn)
   
+  setwd(prev.wd)
   return(list(index=idx, found=found.tax, fn=taxo.fn))
 }
 
