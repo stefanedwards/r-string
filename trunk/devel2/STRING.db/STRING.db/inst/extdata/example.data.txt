@@ -1,3 +1,4 @@
+protein1 protein2 combined_score
 001.A01 001.A02 950
 001.A01 001.A03 950
 001.A01 001.A04 899
