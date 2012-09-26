@@ -36,10 +36,12 @@ make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL) {
   
   if (!is.null(organism$ens2eg)) {
     ppi.ens <- organism$ens2eg(ppi)
-    write.ppi.table(conn, ppi.ens, 'entrez')
-    meta['entrez'] <- '1'
-    if (!is.null(attr(ppi.ens, 'meta'))) 
-      dbWriteTable(conn, 'meta', attr(ppi.ens, 'meta'), append=TRUE, overwrite=FALSE, row.names=FALSE)
+    if (ppi.ens != FALSE) {
+      write.ppi.table(conn, ppi.ens, 'entrez')
+      meta['entrez'] <- '1'
+      if (!is.null(attr(ppi.ens, 'meta'))) 
+        dbWriteTable(conn, 'meta', attr(ppi.ens, 'meta'), append=TRUE, overwrite=FALSE, row.names=FALSE)
+    }
   }
   
   ## Write meta table

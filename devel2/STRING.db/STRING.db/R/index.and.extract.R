@@ -27,9 +27,9 @@ download.flatfile <- function(version, destdir='.') {
 #'    recieves tax id as argument.
 #' @param idx.fn String with filename relative to dest dir for binary index.
 #' @param index.fn String with filename relative to dest dir for text index.
-#' @return List: \code{index} Integer vector with index of all tax ids, 
+#' @return \code{index.flatfile} - List: \code{index} Integer vector with index of all tax ids, 
 #'    \code{found} Logical vector matching which tax ids in \code{taxonomies} were found
-#'    and \code{fn} Character vector of paths to organism flatfiles.
+#'    and \code{fn} Character vector of absolute paths to organism flatfiles.
 #' @section Side effects: 
 #'    Will create a new file in \code{destdir} for each found tax id in \code{taxonomies},
 #'    as well as two index-files (binary and ordinary .RData-type, but with .idx extension.)
@@ -106,6 +106,8 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
   close(ppi.f)
   close(index.f)
 
+  taxo.fn <- sapply(taxo.fn, normalizePath, mustWork=FALSE)
+  
   
   save(idx, file=idx.fn)
   
@@ -121,22 +123,27 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
 #' @param idx Integer vector named by tax id necessary for extraction (see note) or filename where it can be loaded from. 
 #'    Could be result from \code{\link{index.flatfile}}.
 #'    If \code{NULL} and \code{fn} is list, filename of index is extracted and loaded.
+#' @return \code{extract.flatfile} - List with elements \code{fn} character vector of absolute paths to organism specific flatfiles.
 #' @note For \code{extract.flatfile}, the index \code{idx} should not only cover the tax ids of interest, 
 #'    but also the subsequent tax id in the list!
 #'    The tax ids in the index must also be ordered in same order as found in the protein.links flatfile.
-extract.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx=NULL) {
+extract.flatfile <- function(fn, destdir='.', taxonomies, org.fn=NULL, idx=NULL) {
   if (is.list(fn)) {
     org.fn <- ifelse(is.null(org.fn), fn$org.fn, org.fn)
     idx.fn <- ifelse(is.null(idx.fn), fn$idx.fn, idx.fn)
     fn <- fn$fn
   }
-  stopifnot(!is.null(fn), !is.null(idx.fn), is.null(taxonomies), is.null(org.fn))
+  stopifnot(!is.null(fn), !is.null(idx.fn), !is.null(taxonomies), !is.null(org.fn))
   
-  taxonomies <- as.character(sort(as.integer(taxonomies)))
-  fn <- file.path(destdir, fn)
+  taxonomies <- taxonomies[order(as.integer(taxonomies))]
+  fn <- normalizePath(fn, mustWork=TRUE)
+  prev.dir <- setwd(destdir)
+
+  taxo.fn <- sapply(taxonomies, org.fn)
+  found.tax <- structure(rep(FALSE, length(taxonomies)), .Names=taxonomies)  
   
   # Checks whether `idx` is not an integer vector and therefore needs to be loaded from file.
-  if (!is.integer(idx)) {
+  if (!(is.integer(idx) | is.numeric(idx))) {
     idx <- file.path(destdir, idx)
     if (grepl('.*\\.idx',idx)) {
       load(idx)
@@ -157,6 +164,7 @@ extract.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx=
     line.n <- idx[which(names(idx) == taxo)+1]  # Last line + 1 of organism section.
     if (is.na(line.1)) {
       message(paste('Could not find',taxo,'in index.'))
+      next
     }
     if (is.na(line.n)) line.n <- -1  # Defaults to remaining 
     
@@ -168,8 +176,13 @@ extract.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx=
     ppi <- ppi[taxo.ids == as.character(taxo),]
     tmp <- cbind(substr(ppi$id1, n.taxo+2, 300), substr(ppi$id2, n.taxo+2, 300), ppi$score)
     
-    write.table(tmp, file=file.path(destdir, org.fn(taxo)), 
+    write.table(tmp, file=taxo.fn[taxo], 
                 quote=FALSE, sep='\t', row.names=FALSE, col.names=FALSE)
   }
+
+  taxo.fn <- sapply(taxo.fn, normalizePath, mustWork=FALSE)
+  setwd(prev.wd)
+  
+  return(list(fn=taxo.fn))
 }
 
