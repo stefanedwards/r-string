@@ -5,11 +5,10 @@
 #' @param sqlite.fn Path to resulting sqlite db file.
 #' @param organism List matching an organism entry in \code{\link{organisms}}. 
 #'    If \code{NULL}, it will be pulled from \code{\link{organisms}}.
-# @param src.dir Path to location where organism specific flatfiles are.
-# @param dest.dir Path to where resulting sqlite db file should be placed.
+#' @param string.v Value to put in meta-table for key \code{STRING-db}.
 #' @return Live connection to sqlite database.
 #' @note Will remove any prior file with same name as \code{sqlite.fn}.
-make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL) {
+make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL, string.v=NULL) {
   tax.id <- as.character(tax.id)
   if (is.null(organism)) organism <- organisms[[tax.id]]   # organisms specified in `organisms.R`.
   if (is.null(organism)) stop(paste('Could not fetch any organism specifics for',tax.id,'from `organisms`.'))
@@ -22,7 +21,7 @@ make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL) {
   meta <- vector('character')
   
   meta['Created'] <- date()
-  meta['STRING-db'] <- 'Err...'
+  if (!is.null(string.v)) meta['STRING-db'] <- string.v
   meta['primary'] <- organism$primary
   meta[organism$primary] <- 'TRUE'
   meta['Organism'] <- organism$long

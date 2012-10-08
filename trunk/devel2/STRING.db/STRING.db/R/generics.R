@@ -95,6 +95,7 @@ getPPI <- function(conn, proteins, cutoff, encoding, as.list, simplify) {
   } else if (db.schema >= 0.2) {
     res <- getPPI.0.2(conn, proteins, cutoff, encoding, as.list, simplify)
   }
+  return(res)
 }
 #' @rdname getPPI
 #' @inheritParams getPPI
@@ -133,9 +134,9 @@ getPPI.0.2 <- function(conn, proteins, cutoff, encoding, as.list, simplify) {
   tbl.id <- paste(encoding, '_ids', sep='')
   if (!tbl.id %in% dbListTables(conn)) {
     # Read ppi directly from table
-    sql <- sprintf('SELECT id1, id2, score FROM %s WHERE score > @score AND id1 = @id1 ORDER BY id1;', encoding)
+    sql <- sprintf('SELECT id1, id2, score FROM %s WHERE score >= @score AND id1 = @id1 ORDER BY id1;', encoding)
   } else {
-    sql <- sprintf('SELECT g1.gene as id1, g2.gene as id2, score FROM %1$s INNER JOIN %2$s AS g1 ON g1.id=id1 INNER JOIN %2$s AS g2 ON g2.id=id2 WHERE score > @score AND g1.gene = @id1 ORDER BY id1;', encoding, tbl.id)
+    sql <- sprintf('SELECT g1.gene as id1, g2.gene as id2, score FROM %1$s INNER JOIN %2$s AS g1 ON g1.id=id1 INNER JOIN %2$s AS g2 ON g2.id=id2 WHERE score >= @score AND g1.gene = @id1 ORDER BY id1;', encoding, tbl.id)
   }
   res <- dbGetQuery(conn, sql, data.frame(score=cutoff, id1=proteins))
   
@@ -156,7 +157,7 @@ getPPI.0.2 <- function(conn, proteins, cutoff, encoding, as.list, simplify) {
 # @author Stefan McKinnon Edwards \email{stefan.hoj-edwards@@agrsci.dk}
 #' @return data.frame with one column.
 #' @export
-getNames <- function(conn, encoding=NULL, filter=NULL) {
+getNames <- function(conn, encoding, filter=NULL) {
   db.schema <- getDBSchema(conn)
   if (db.schema == 0.1) {
     res <- getNames.0.1(conn, encoding, filter)
