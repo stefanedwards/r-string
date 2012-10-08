@@ -47,6 +47,7 @@ getDBSchema <- function(conn) {
 #' @return List with entries named by the key; return value is reduced to character vector if only one key is retrieved.
 # @author Stefan McKinnon Edwards \email{stefan.hoj-edwards@@agrsci.dk}
 #' @seealso \code{\link{STRING.db}}
+#' @export
 getMeta <- function(conn, key='%', as.bool=FALSE) {
   #stop('getMeta is not implemented')
   db.schema <- getDBSchema(conn)
@@ -101,16 +102,16 @@ getPPI <- function(conn, proteins, cutoff, encoding, as.list, simplify) {
 #' @inheritParams getPPI
 getPPI.0.1 <- function(conn, proteins, cutoff, encoding, as.list, simplify) {
   encoding <- tolower(encoding)
-  if (!encoding %in% .known.encodings) stop('Could not recognize encoding. See ::.known.encodings.')
+  if (!encoding %in% known.encodings) stop('Could not recognize encoding. See ::.known.encodings.')
   #tbl <- dbGetQuery(conn, "SELECT value FROM meta WHERE meta = ?;", encoding)
-  tbl <- .getMeta(conn, encoding)
+  tbl <- getMeta(conn, encoding)
   if (length(tbl) == 0) stop('There does not exist any mappings for the given encoding.')  
   
-  if (encoding == .getMeta(conn, 'Primary encoding')) {
+  if (encoding == getMeta(conn, 'Primary encoding')) {
     sql <- sprintf('SELECT `g1`.`gene` as `g1`, `g2`.`gene` as `g2`, `ppi`.`score` FROM geneids as g1
     INNER JOIN %s as ppi ON ppi.id1 = g1.id
                    inner join geneids as g2 on g2.id=ppi.id2
-                   where g1.gene = @g and ppi.score >= @s;', .getMeta(conn, 'Primary PPI'))
+                   where g1.gene = @g and ppi.score >= @s;', getMeta(conn, 'Primary PPI'))
   } else {
     sql <- sprintf('SELECT `id1` as `g1`, `id2` as `g2`, `score` as `score` FROM %s WHERE `id` = @g AND `score` >= @s', tbl)
   }

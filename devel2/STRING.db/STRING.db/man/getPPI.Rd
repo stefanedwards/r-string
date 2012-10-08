@@ -1,8 +1,16 @@
 \name{getPPI}
 \alias{getPPI}
+\alias{getPPI.0.1}
+\alias{getPPI.0.2}
 \title{Generic function for retrieving the protein-protein interaction data from organism data packages.}
 \usage{
   getPPI(conn, proteins, cutoff, encoding, as.list,
+    simplify)
+
+  getPPI.0.1(conn, proteins, cutoff, encoding, as.list,
+    simplify)
+
+  getPPI.0.2(conn, proteins, cutoff, encoding, as.list,
     simplify)
 }
 \arguments{

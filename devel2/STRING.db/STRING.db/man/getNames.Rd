@@ -4,7 +4,7 @@
 \alias{getNames.0.2}
 \title{Generic function for reading all saved gene/protein names of the primary type.}
 \usage{
-  getNames(conn, encoding = NULL, filter = NULL)
+  getNames(conn, encoding, filter = NULL)
 
   getNames.0.1(conn, encoding, filter)
 

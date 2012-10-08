@@ -184,6 +184,7 @@ extract.flatfile <- function(fn, destdir='.', taxonomies, org.fn=NULL, idx=NULL)
 
   taxo.fn <- sapply(taxo.fn, normalizePath, mustWork=FALSE)
   setwd(prev.wd)
+  close(ppi.f)
   
   return(list(fn=taxo.fn))
 }
