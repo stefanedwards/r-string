@@ -53,7 +53,7 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
   dir.create(destdir, showWarnings=FALSE)
   prev.wd <- setwd(destdir)
   taxo.fn <- sapply(taxonomies, org.fn)
-
+  unlink(taxo.fn)
   
   ## Open connections for input file and index file.
   ppi.f <- opener(fn)
@@ -141,6 +141,7 @@ extract.flatfile <- function(fn, destdir='.', taxonomies, org.fn=NULL, idx=NULL)
   prev.wd <- setwd(destdir)
 
   taxo.fn <- sapply(taxonomies, org.fn)
+  unlink(taxo.fn)
   found.tax <- structure(rep(FALSE, length(taxonomies)), .Names=taxonomies)  
   
   # Checks whether `idx` is not an integer vector and therefore needs to be loaded from file.

@@ -17,6 +17,7 @@ org.fn <- function(taxo) paste('test',taxo,'tab',sep='.')
 idx.fn <- 'text.idx'
 index.fn <- 'test.index'
 res <- index.flatfile(fn, destdir, taxonomies, org.fn, idx.fn, index.fn)
+encoding <- 'ensembl'
 
 ## hard coded correct results; use `dump(small.ppi, '')` to get this representation.
 ex.data <- list()
@@ -47,17 +48,35 @@ cat('Proceeding to create and test databases.')
 
 # Define organism specific settings. This is minimal example.
 organisms <- list()
-organisms$`001` <- list(short='T1', long='Test organism 1', primary='ensembl')
-organisms$`002` <- list(short='T2', long='Test organism 2', primary='ensembl')
-organisms$`003` <- list(short='T3', long='Test organism 3', primary='ensembl')
+organisms$`001` <- list(short='T1', long='Test organism 1', primary=encoding)
+organisms$`002` <- list(short='T2', long='Test organism 2', primary=encoding)
+organisms$`003` <- list(short='T3', long='Test organism 3', primary=encoding)
 
-ex.names <- list()
-ex.names$`001` <- paste('A0', 1:5, sep='')
+gene.names <- list()
+gene.names$`001` <- paste('A0', 1:5, sep='')
+gene.names$`002` <- paste('B0', 1:4, sep='')
+gene.names$`003` <- paste('C0', 1:3, sep='')
 
+test.data <- lapply(ex.data, function(x) structure(x[x$V3 >= 800,], .Names=c('id1','id2','score') , row.names=1:sum(x$V3 >= 800))  )
 
+for (taxo in names(organisms)) {
+  cat('Testing creating and use of database using tax id', taxo)
+  conn <- make.sqlite(taxo, res2$fn[taxo], file.path(destdir, sprintf(string.db.fn, 'STRING', organisms[[taxo]]$short)), string.v='Not string!') ## argument `organism` is pulled from `organisms` if not given.
+  checkEquals(getMeta(conn, 'STRING-db'), 'Not string!')
+  
+  all.metas <- getMeta(conn)
+  checkEquals(length(all.metas), 6)
+  checkEquals(as.bool(all.metas$ensembl), TRUE)
+  
+  checkEquals(getNames(conn, encoding)$gene, gene.names[[taxo]])
+  
+  true.ppi <- test.data[[taxo]]
+  get.ppi <- getPPI(conn, unique(true.ppi$id1), 800, encoding=encoding, as.list=FALSE, simplify=FALSE)
+  checkEquals(true.ppi, get.ppi)
 
-#for (taxo in names(organisms))
-conn <- make.sqlite('001', res2$fn['001'], file.path(destdir, 'STRING.T1.sqlite')) ## argument `organism` is pulled from `organisms` if not given.
-
-
-
+  get.ppi <- getPPI(conn, unique(true.ppi$id1), 800, encoding=encoding, as.list=TRUE, simplify=FALSE)
+  checkEquals(length(get.ppi), length(unique(true.ppi$id1)))
+  
+  get.ppi <- getPPI(conn, unique(true.ppi$id1), 800, encoding=encoding, as.list=TRUE, simplify=TRUE)
+  checkEquals(length(get.ppi), length(unique(true.ppi$id2)))
+}
