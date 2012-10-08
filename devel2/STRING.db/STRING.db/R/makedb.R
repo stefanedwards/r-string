@@ -11,7 +11,7 @@
 #' @note Will remove any prior file with same name as \code{sqlite.fn}.
 make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL) {
   tax.id <- as.character(tax.id)
-  if (is.null(organism)) organism <- organisms[[tax.id]] 
+  if (is.null(organism)) organism <- organisms[[tax.id]]   # organisms specified in `organisms.R`.
   if (is.null(organism)) stop(paste('Could not fetch any organism specifics for',tax.id,'from `organisms`.'))
   
   require(RSQLite)
@@ -24,7 +24,7 @@ make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL) {
   meta['Created'] <- date()
   meta['STRING-db'] <- 'Err...'
   meta['primary'] <- organism$primary
-  meta[organism$primary] <- '1'
+  meta[organism$primary] <- 'TRUE'
   meta['Organism'] <- organism$long
   meta['DB Schema'] <- 0.2 
     ## 0.1 was on emphasis on primary encoding, e.g. geneids and ppi.
@@ -38,7 +38,7 @@ make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL) {
     ppi.ens <- organism$ens2eg(ppi)
     if (ppi.ens != FALSE) {
       write.ppi.table(conn, ppi.ens, 'entrez')
-      meta['entrez'] <- '1'
+      meta['entrez'] <- 'TRUE'
       if (!is.null(attr(ppi.ens, 'meta'))) 
         dbWriteTable(conn, 'meta', attr(ppi.ens, 'meta'), append=TRUE, overwrite=FALSE, row.names=FALSE)
     }
@@ -46,6 +46,8 @@ make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL) {
   
   ## Write meta table
   dbWriteTable(conn, 'meta', data.frame(key=names(meta), value=meta), append=TRUE, overwrite=FALSE, row.names=FALSE)
+  
+  return(conn)
 }
 
 #' Writes ppi-data.frame to database.
