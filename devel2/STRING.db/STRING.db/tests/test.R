@@ -2,12 +2,15 @@
 ## Test STRING.db
 #############################
 
+require(STRING.db)
+require(RUnit)
+
 ### Essentially, this is the example from example.data.
 ### It tries to open the example data file, extract the taxonomies and creates sqlite-files from it.
 fn <- system.file('extdata','example.data.txt', package='STRING.db', mustWork=TRUE)
 #
 #fn <- "C:/Projects/r-string/devel2/STRING.db/STRING.db/inst/extdata/example.data.txt"
-fn <- "/home/stefan/Repos/r-string/devel2/STRING.db/STRING.db/inst/extdata/example.data.txt"
+#fn <- "/home/stefan/Repos/r-string/devel2/STRING.db/STRING.db/inst/extdata/example.data.txt"
 destdir <- 'test'
 taxonomies <- c('001','002','003','004')
 org.fn <- function(taxo) paste('test',taxo,'tab',sep='.')
@@ -41,3 +44,5 @@ for (taxo in names(ex.data)) {
 
 cat('Indexing and extracting example data worked.')
 cat('Proceeding to create and test databases.')
+
+

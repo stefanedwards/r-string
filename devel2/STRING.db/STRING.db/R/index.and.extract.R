@@ -127,6 +127,7 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
 #' @note For \code{extract.flatfile}, the index \code{idx} should not only cover the tax ids of interest, 
 #'    but also the subsequent tax id in the list!
 #'    The tax ids in the index must also be ordered in same order as found in the protein.links flatfile.
+#' @export
 extract.flatfile <- function(fn, destdir='.', taxonomies, org.fn=NULL, idx=NULL) {
   if (is.list(fn)) {
     org.fn <- ifelse(is.null(org.fn), fn$org.fn, org.fn)
@@ -137,7 +138,7 @@ extract.flatfile <- function(fn, destdir='.', taxonomies, org.fn=NULL, idx=NULL)
   
   taxonomies <- taxonomies[order(as.integer(taxonomies))]
   fn <- normalizePath(fn, mustWork=TRUE)
-  prev.dir <- setwd(destdir)
+  prev.wd <- setwd(destdir)
 
   taxo.fn <- sapply(taxonomies, org.fn)
   found.tax <- structure(rep(FALSE, length(taxonomies)), .Names=taxonomies)  

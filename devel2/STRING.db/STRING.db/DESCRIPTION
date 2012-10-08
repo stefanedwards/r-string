@@ -11,5 +11,5 @@ biocViews: AnnotationData, Software
 URL: http://code.google.com/p/r-string/
 Date: 2012-09-21
 Depends: R (>= 2.7.0), RSQLite
-Suggests: AnnotationFuncs
+Suggests: AnnotationFuncs, RUnit
 Collate: 'organisms.R' 'settings.R' 'generics.R' 'index.and.extract.R' 'makedb.R'
