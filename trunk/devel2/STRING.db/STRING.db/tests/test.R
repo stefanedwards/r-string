@@ -45,4 +45,19 @@ for (taxo in names(ex.data)) {
 cat('Indexing and extracting example data worked.')
 cat('Proceeding to create and test databases.')
 
+# Define organism specific settings. This is minimal example.
+organisms <- list()
+organisms$`001` <- list(short='T1', long='Test organism 1', primary='ensembl')
+organisms$`002` <- list(short='T2', long='Test organism 2', primary='ensembl')
+organisms$`003` <- list(short='T3', long='Test organism 3', primary='ensembl')
+
+ex.names <- list()
+ex.names$`001` <- paste('A0', 1:5, sep='')
+
+
+
+#for (taxo in names(organisms))
+conn <- make.sqlite('001', res2$fn['001'], file.path(destdir, 'STRING.T1.sqlite')) ## argument `organism` is pulled from `organisms` if not given.
+
+
 

@@ -26,22 +26,52 @@ dbfile <- function(x) get('dbfile', envir=x)
 #' E.g. Entrez, Ensembl or Refseq are examples of encodings.
 known.encodings <- c('ensembl','entrez','refseq')
 
+
+#' Get db schema version
+#' 
+#' @param conn Database connection to STRING.db-sqlite database.
+#' @return Numeric value of DB schema version.
+getDBSchema <- function(conn) {
+  res <- dbReadTable(conn, 'meta')
+  row <- which(res == 'DB Schema')
+  if (length(row) < 1) stop('Cannot figure the DB Schema in sqlite-file.')
+  db.schema <- as.numeric(res[row,2])
+  return(db.schema)
+}
+
 #' Generic function for retrieving meta-data from organism data packages.
 #'
 #' @param conn Database connection to STRING.db-sqlite database.
 #' @param key Character vector of which keys to retrieve; use sqlite syntax for wildcards (e.g. % to match all characters). Defaults to retrieve all keys.
+#' @param as.bool Coerce result into logical. Useful if requesting known keys.
 #' @return List with entries named by the key; return value is reduced to character vector if only one key is retrieved.
 # @author Stefan McKinnon Edwards \email{stefan.hoj-edwards@@agrsci.dk}
 #' @seealso \code{\link{STRING.db}}
-getMeta <- function(conn, key='%') {
-  stop('getMeta is not implemented')
-  #dbReadTable(conn, 'meta')
-  #res <- dbGetQuery(conn, 'SELECT * FROM meta WHERE meta LIKE ?;', data.frame(key))
-  #res$meta = factor(res$meta)
-  #if (nlevels(res$meta) == 1)
-  #  return(res$value)
-  #return(split(res$value, res$meta))
+getMeta <- function(conn, key='%', as.bool=FALSE) {
+  #stop('getMeta is not implemented')
+  db.schema <- getDBSchema(conn)
+  if (db.schema == 0.1) {
+    res <- dbGetQuery(conn, 'SELECT * FROM meta WHERE meta LIKE ?;', data.frame(key))
+    res$meta = factor(res$meta)
+    if (nlevels(res$meta) == 1)
+      return(res$value)
+    return(split(res$value, res$meta))
+  } else if (db.schema >= 0.2) {
+    res <- getMeta.0.2(conn, key)
+    if (as.bool) res <- as.bool(res)
+    return(res)
+  }
 }
+#' @rdname getMeta
+#' @inheritParams getMeta
+getMeta.0.2 <- function(conn, key) {
+  res <- dbGetQuery(conn, 'SELECT * FROM meta where key LIKE ?;', data.frame(key))
+  res$key = factor(res$key)
+  if (nlevels(res$key) == 1)
+    return(res$value)
+  return(split(res$value, res$key))  
+}
+
 
 
 #' Generic function for retrieving the protein-protein interaction data from organism data packages.
@@ -59,30 +89,61 @@ getMeta <- function(conn, key='%') {
 #' @seealso \code{\link{known.encodings}}, \code{\link{STRING.db}}, \code{\link{getNames}}
 #' @export
 getPPI <- function(conn, proteins, cutoff, encoding, as.list, simplify) {
-  stop('getPPI is not implemented.')
-#   encoding <- tolower(encoding)
-#   if (!encoding %in% .known.encodings) stop('Could not recognize encoding. See ::.known.encodings.')
-#   #tbl <- dbGetQuery(conn, "SELECT value FROM meta WHERE meta = ?;", encoding)
-#   tbl <- .getMeta(conn, encoding)
-#   if (length(tbl) == 0) stop('There does not exist any mappings for the given encoding.')  
-#   
-#   if (encoding == .getMeta(conn, 'Primary encoding')) {
-#     sql <- sprintf('SELECT `g1`.`gene` as `g1`, `g2`.`gene` as `g2`, `ppi`.`score` FROM geneids as g1
-#     INNER JOIN %s as ppi ON ppi.id1 = g1.id
-#                    inner join geneids as g2 on g2.id=ppi.id2
-#                    where g1.gene = @g and ppi.score >= @s;', .getMeta(conn, 'Primary PPI'))
-#   } else {
-#     sql <- sprintf('SELECT `id1` as `g1`, `id2` as `g2`, `score` as `score` FROM %s WHERE `id` = @g AND `score` >= @s', tbl)
-#   }
-#   res <- dbGetQuery(conn, sql, list(g=proteins, s=cutoff))
-#   
-#   # Three different return options
-#   if (simplify)
-#     return(unique(res[,2]))
-#   if (as.list)
-#     return(split(res[,2], as.factor(res[,1])))
-#   return(res)
+  db.schema <- getDBSchema(conn)
+  if (db.schema == 0.1) {
+    res <- getPPI.0.1(conn, proteins, cutoff, encoding, as.list, simplify)
+  } else if (db.schema >= 0.2) {
+    res <- getPPI.0.2(conn, proteins, cutoff, encoding, as.list, simplify)
+  }
+}
+#' @rdname getPPI
+#' @inheritParams getPPI
+getPPI.0.1 <- function(conn, proteins, cutoff, encoding, as.list, simplify) {
+  encoding <- tolower(encoding)
+  if (!encoding %in% .known.encodings) stop('Could not recognize encoding. See ::.known.encodings.')
+  #tbl <- dbGetQuery(conn, "SELECT value FROM meta WHERE meta = ?;", encoding)
+  tbl <- .getMeta(conn, encoding)
+  if (length(tbl) == 0) stop('There does not exist any mappings for the given encoding.')  
   
+  if (encoding == .getMeta(conn, 'Primary encoding')) {
+    sql <- sprintf('SELECT `g1`.`gene` as `g1`, `g2`.`gene` as `g2`, `ppi`.`score` FROM geneids as g1
+    INNER JOIN %s as ppi ON ppi.id1 = g1.id
+                   inner join geneids as g2 on g2.id=ppi.id2
+                   where g1.gene = @g and ppi.score >= @s;', .getMeta(conn, 'Primary PPI'))
+  } else {
+    sql <- sprintf('SELECT `id1` as `g1`, `id2` as `g2`, `score` as `score` FROM %s WHERE `id` = @g AND `score` >= @s', tbl)
+  }
+  res <- dbGetQuery(conn, sql, list(g=proteins, s=cutoff))
+  
+  # Three different return options
+  if (simplify)
+    return(unique(res[,2]))
+  if (as.list)
+    return(split(res[,2], as.factor(res[,1])))
+  return(res)
+}
+#' @rdname getPPI
+#' @inheritParams getPPI
+getPPI.0.2 <- function(conn, proteins, cutoff, encoding, as.list, simplify) {
+  has.enc <- getMeta(conn, encoding, as.bool=TRUE)
+  if (has.enc != TRUE) stop(paste('Encoding `', encoding, '` is not listed in meta-table.', sep=''))
+  
+  encoding <- tolower(encoding)
+  
+  tbl.id <- paste(encoding, '_ids', sep='')
+  if (!tbl.id %in% dbListTables(conn)) {
+    # Read ppi directly from table
+    sql <- sprintf('SELECT id1, id2, score FROM %s WHERE score > @score AND id1 = @id1 ORDER BY id1;', encoding)
+  } else {
+    sql <- sprintf('SELECT g1.gene as id1, g2.gene as id2, score FROM %1$s INNER JOIN %2$s AS g1 ON g1.id=id1 INNER JOIN %2$s AS g2 ON g2.id=id2 WHERE score > @score AND g1.gene = @id1 ORDER BY id1;', encoding, tbl.id)
+  }
+  res <- dbGetQuery(conn, sql, data.frame(score=cutoff, id1=proteins))
+  
+  if (simplify)
+    return(unique(res$id2))
+  if (as.list)
+    return(split(res$id2, as.factor(res$id1)))
+  return(res)
 }
 
 #' Generic function for reading all saved gene/protein names of the primary type.
@@ -96,11 +157,14 @@ getPPI <- function(conn, proteins, cutoff, encoding, as.list, simplify) {
 #' @return data.frame with one column.
 #' @export
 getNames <- function(conn, encoding=NULL, filter=NULL) {
-  db.schema <- getMeta(conn, 'DB Schema')
-  stopifnot(length(db.schema) == 1)
+  db.schema <- getDBSchema(conn)
+  if (db.schema == 0.1) {
+    res <- getNames.0.1(conn, encoding, filter)
+  } else if (db.schema >= 0.2) {
+    res <- getNames.0.2(conn, encoding, filter)
+  }
   
-  gn <- get(paste('getNames',db.schema))
-  return(gn(conn, encoding=encoding, filter=filter))
+  return(res)
 }
 #' @rdname getNames
 #' @inheritParams getNames
@@ -114,7 +178,8 @@ getNames.0.1 <- function(conn, encoding, filter) {
 #' @rdname getNames
 #' @inheritParams getNames
 getNames.0.2 <- function(conn, encoding, filter) {
-  has.enc <- getMeta(conn, encoding)
+  has.enc <- getMeta(conn, encoding, as.bool=TRUE)
+  if (has.enc != TRUE) stop(paste('Encoding `', encoding, '` is not listed in meta-table.', sep=''))
   
   tbl.id <- paste(encoding, '_ids', sep='')
   if (!tbl.id %in% dbListTables(conn)) {

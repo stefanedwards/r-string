@@ -85,7 +85,7 @@ ens2eg <- function(ppi, db, obj) {
   .stringAsFactors <- getOption('stringAsFactors')
   options(stringAsFactors=FALSE)
   require(AnnotationFuncs)
-  if (!require(db, character.only=TRUE)) return(FALSE)
+  require(db, character.only=TRUE)
   
   ens2ent <- AnnotationFuncs::translate(ppi[,1:2], get(obj), return.list=FALSE)
   ens2ent$from <- as.character(ens2ent$from)
@@ -113,3 +113,17 @@ ens2eg <- function(ppi, db, obj) {
 #  return(function(ppi) ens2eg(ppi, db, obj))
 #}
 
+#' Auxiliary function: Forcing vectors into logical.
+#' 
+#' If a vector or list is zero-length, then it will always return FALSE.
+#' Otherwise, it applies \code{as.logical} to the argument.
+#' @return Argument coerced to boolean/logical vector/list.
+#' @param x Vector or list.
+#' @examples
+#' as.bool(c(TRUE, FALSE, 'TRUE', 'FALSE', '0', '1', 0, 1))
+#' as.bool(list(TRUE, FALSE, 'TRUE', 'FALSE', '0', '1', 0, 1))
+as.bool <- function(x) {
+  if (length(x) == 0)
+    return(FALSE)
+  return(as.logical(x))
+}
