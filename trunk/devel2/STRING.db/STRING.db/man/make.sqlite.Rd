@@ -3,7 +3,7 @@
 \title{Makes sqlite database for organism}
 \usage{
   make.sqlite(tax.id, flatfile.fn, sqlite.fn,
-    organism = NULL)
+    organism = NULL, string.v = NULL)
 }
 \arguments{
   \item{tax.id}{String with taxonomy id, e.g. 9913 for
@@ -18,6 +18,9 @@
   \item{organism}{List matching an organism entry in
   \code{\link{organisms}}.  If \code{NULL}, it will be
   pulled from \code{\link{organisms}}.}
+
+  \item{string.v}{Value to put in meta-table for key
+  \code{STRING-db}.}
 }
 \value{
   Live connection to sqlite database.

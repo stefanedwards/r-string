@@ -43,8 +43,8 @@ for (taxo in names(ex.data)) {
 }
 
 
-cat('Indexing and extracting example data worked.')
-cat('Proceeding to create and test databases.')
+cat('Indexing and extracting example data worked.\n')
+cat('Proceeding to create and test databases.\n')
 
 # Define organism specific settings. This is minimal example.
 organisms <- list()
@@ -60,13 +60,13 @@ gene.names$`003` <- paste('C0', 1:3, sep='')
 test.data <- lapply(ex.data, function(x) structure(x[x$V3 >= 800,], .Names=c('id1','id2','score') , row.names=1:sum(x$V3 >= 800))  )
 
 for (taxo in names(organisms)) {
-  cat('Testing creating and use of database using tax id', taxo)
-  conn <- make.sqlite(taxo, res2$fn[taxo], file.path(destdir, sprintf(string.db.fn, 'STRING', organisms[[taxo]]$short)), string.v='Not string!') ## argument `organism` is pulled from `organisms` if not given.
+  cat('Testing creating and use of database using tax id', taxo,'\n')
+  conn <- make.sqlite(taxo, res2$fn[taxo], file.path(destdir, paste('STRING', organisms[[taxo]]$short, 'sqlite3', sep='.')), organism=organisms[[taxo]], string.v='Not string!') ## argument `organism` is pulled from `organisms` if not given.
   checkEquals(getMeta(conn, 'STRING-db'), 'Not string!')
   
   all.metas <- getMeta(conn)
   checkEquals(length(all.metas), 6)
-  checkEquals(as.bool(all.metas$ensembl), TRUE)
+  checkEquals(STRING.db:::as.bool(all.metas$ensembl), TRUE)
   
   checkEquals(getNames(conn, encoding)$gene, gene.names[[taxo]])
   
@@ -79,4 +79,5 @@ for (taxo in names(organisms)) {
   
   get.ppi <- getPPI(conn, unique(true.ppi$id1), 800, encoding=encoding, as.list=TRUE, simplify=TRUE)
   checkEquals(length(get.ppi), length(unique(true.ppi$id2)))
+  dbDisconnect(conn)
 }

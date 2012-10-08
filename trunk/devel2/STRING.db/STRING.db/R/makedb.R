@@ -6,6 +6,7 @@
 #' @param organism List matching an organism entry in \code{\link{organisms}}. 
 #'    If \code{NULL}, it will be pulled from \code{\link{organisms}}.
 #' @param string.v Value to put in meta-table for key \code{STRING-db}.
+#' @export
 #' @return Live connection to sqlite database.
 #' @note Will remove any prior file with same name as \code{sqlite.fn}.
 make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL, string.v=NULL) {

@@ -106,12 +106,6 @@ ens2eg <- function(ppi, db, obj) {
   options(stringAsFactors=.stringAsFactors)
   return(ppi.entrez)
 }
-# #' @rdname ens2eg
-# #' @inheritParams ens2eg
-# #' @return \code{make.ens2eg} returns function alike \code{ens2eg} that is setup for specific db and obj.
-#make.ens2eg <- function(db, obj) {
-#  return(function(ppi) ens2eg(ppi, db, obj))
-#}
 
 #' Auxiliary function: Forcing vectors into logical.
 #' 
@@ -120,8 +114,8 @@ ens2eg <- function(ppi, db, obj) {
 #' @return Argument coerced to boolean/logical vector/list.
 #' @param x Vector or list.
 #' @examples
-#' as.bool(c(TRUE, FALSE, 'TRUE', 'FALSE', '0', '1', 0, 1))
-#' as.bool(list(TRUE, FALSE, 'TRUE', 'FALSE', '0', '1', 0, 1))
+#' STRING.db:::as.bool(c(TRUE, FALSE, 'TRUE', 'FALSE', '0', '1', 0, 1))
+#' STRING.db:::as.bool(list(TRUE, FALSE, 'TRUE', 'FALSE', '0', '1', 0, 1))
 as.bool <- function(x) {
   if (length(x) == 0)
     return(FALSE)
