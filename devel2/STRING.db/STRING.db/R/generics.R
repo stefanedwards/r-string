@@ -201,3 +201,32 @@ getNames.0.2 <- function(conn, encoding, filter) {
     }    
   }
 }
+
+
+#' Prepares a data object with all data.
+#' 
+#' @param conn Live connection to database.
+#' @param encoding String naming the encoding (e.g. entrez or ensembl).
+#' @param cutoff Score cut-off; only retrieves ppi with scores larger than or equal to.
+#' @return List with names as id1 and elements as id2.
+#' @export
+#' @seealso \code{\link{cacheObject}}.
+makeCache <- function(conn, encoding, cutoff) {
+  if (getDBSchema(conn) < 0.2) stop('makeCache not support by DB schema < 0.2!')
+  
+  has.enc <- getMeta(conn, encoding, as.bool=TRUE)
+  if (has.enc != TRUE) stop(paste('Encoding `', encoding, '` is not listed in meta-table.', sep=''))
+  
+  
+  
+  tbl.id <- paste(encoding, '_ids', sep='')
+  if (!tbl.id %in% dbListTables(conn)) {
+    sql <- sprintf('SELECT id1, id2, score FROM %s WHERE score >= @score AND id1 = @id1 ORDER BY id1, id2;', encoding)
+  } else {
+    sql <- sprintf('SELECT g1.gene as id1, g2.gene as id2 FROM %1$s INNER JOIN %2$s AS g1 ON g1.id=id1 INNER JOIN %2$s AS g2 ON g2.id=id2 WHERE score >= @score ORDER BY id1, id2;', encoding, tbl.id)
+  }
+
+  res <- dbGetQuery(conn, sql, data.frame(score=cutoff))
+  
+  return(split(res$id2, as.factor(res$id1)))
+}

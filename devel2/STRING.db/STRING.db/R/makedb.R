@@ -87,8 +87,20 @@ write.ppi.table <- function(conn, ppi, encoding) {
   dbSendQuery(conn, sprintf('CREATE INDEX `IDX_%s_score` ON `%s` (`score`);', encoding, encoding))
 }
 
-make.cache <- function(conn, encoding, cutoff) {
-  all.names <- getNames(conn, encoding)
-  res <- getPPI(conn, proteins=all.names, cutoff=cutoff, encoding=encoding, as.list=TRUE, simplify=FALSE)
-  return(res)
+#' Creates a data-object with a given variable name.
+#' 
+#' Uses \code{\link{makeCache}} to make a data-object with all PPI's,
+#' and saves the object with a given variable name into an environment.
+#' @param conn Live connection to database.
+#' @param encoding String naming the encoding (e.g. entrez or ensembl).
+#' @param cutoff Score cut-off; only retrieves ppi with scores larger than or equal to.
+#' @param var.name The variable named that the object is assigned to.
+#' @param envir Environment where the object is saved. Defaults to \code{\link[base:environment]{new.env()}}.
+#' @return Environement \code{envir} with the data object.
+#' @export
+#' @seealso \code{\link{makeCache}}.
+cacheObject <- function(conn, encoding, cutoff, var.name, envir=new.env()) {
+  res <- makeCache(conn, encoding=encoding, cutoff=cutoff)
+  assign(var.name, res, envir=envir)
+  return(envir)
 }
