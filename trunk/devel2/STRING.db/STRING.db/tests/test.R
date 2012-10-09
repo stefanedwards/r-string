@@ -58,6 +58,7 @@ gene.names$`002` <- paste('B0', 1:4, sep='')
 gene.names$`003` <- paste('C0', 1:3, sep='')
 
 test.data <- lapply(ex.data, function(x) structure(x[x$V3 >= 800,], .Names=c('id1','id2','score') , row.names=1:sum(x$V3 >= 800))  )
+data.list <- lapply(test.data, function(x) split(x$id2, as.factor(x$id1)))
 
 for (taxo in names(organisms)) {
   cat('Testing creating and use of database using tax id', taxo,'\n')
@@ -79,5 +80,9 @@ for (taxo in names(organisms)) {
   
   get.ppi <- getPPI(conn, unique(true.ppi$id1), 800, encoding=encoding, as.list=TRUE, simplify=TRUE)
   checkEquals(length(get.ppi), length(unique(true.ppi$id2)))
+  
+  temp <- cacheObject(conn, encoding=encoding, cutoff=800, var.name='temp.cache', envir=globalenv())
+  checkEquals(temp.cache, data.list[[taxo]])
+  
   dbDisconnect(conn)
 }
