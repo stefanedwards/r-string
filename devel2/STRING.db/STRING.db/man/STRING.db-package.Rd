@@ -2,7 +2,7 @@
 \name{STRING.db-package}
 \alias{STRING.db}
 \alias{STRING.db-package}
-\title{STRING database interface.}
+\title{STRING-db creation utility and database interface package}
 \description{
   Interface package for organism
   protein-protein-interaction data packages from
@@ -13,27 +13,28 @@
   authors of STRING.
 }
 \examples{
-\dontrun{library(RSQLite)
 
-## Crude example of the data we expect to find in the organism data packages. ##
-conn <- dbConnect(dbDriver('SQLite'), ':memory:')
-meta <- data.frame(meta=c('ensembl','Primary encoding','Primary PPI','name','bla','bla','dude'), value=c('ppi','ensembl','ppi','lolcat','chezburger','rainbow','greg'))
-dbWriteTable(conn, 'meta', meta, row.names=FALSE, overwrite=TRUE)
+library(RSQLite)
 
-geneid <- data.frame(id=1:4, gene=letters[1:4])
-dbWriteTable(conn, 'geneids', geneid, row.names=FALSE, overwrite=TRUE)
+destdir <- 'test'
+\dontrun{
+  # To download the entire STRING flatfile from the web.
+  fn <- download.flatfile(9.0, destdir)
+  taxonomies <- c('9913','9606')
+  res <- index.flatfile(fn, destdir, taxonomies)
+}
 
-ppi <- data.frame(id1=c(rep(1, 3), rep(2, 2), rep(3,3), rep(4,2)), id2=c(2,3,4, 1,3, 1,2,4, 1,3), score=c(950, 900, 700,  950, 900,  900, 900, 700,  700, 700))
-dbWriteTable(conn, 'ppi', ppi, row.names=FALSE, overwrite=TRUE)
+# We however do it with the example data set.
+fn <- system.file('extdata','example.data.txt', package='STRING.db', mustWork=TRUE)
+taxonomies <- c('001','002','003')
+org.fn <- function(taxo) paste('test',taxo,'tab',sep='.')
+idx.fn <- 'text.idx'
+index.fn <- 'test.index'
+res <- index.flatfile(fn, destdir, taxonomies, org.fn, idx.fn, index.fn)
 
-## Example of fetching meta data. ##
-STRING.db:::.getMeta(conn, '\%')
-STRING.db:::.getMeta(conn, 'name')
-
-## Example of retrieving PPI data. ##
-STRING.db:::.getPPI(conn, 'a', cutoff=0, encoding='ensembl', as.list=FALSE, simplify=FALSE)  # Here, we are cheating with the encoding...
-
-dbDisconnect(conn)}
+for (taxo in taxonomies) {
+  makePackage(taxo, res$fn[taxo], STRING.db::Latest.STRING.version)
+}
 }
 \author{
   Stefan McKinnon Edwards

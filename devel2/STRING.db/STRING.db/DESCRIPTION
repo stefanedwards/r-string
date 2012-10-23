@@ -2,14 +2,14 @@ Package: STRING.db
 Maintainer: Stefan McKinnon Edwards <stefan.hoj-edwards@agrsci.dk>
 License: GPL-2
 BugReports: 
-Title: STRING.db database interface
+Title: STRING-db creation utility and database interface package
 Author: Stefan McKinnon Edwards <stefan.hoj-edwards@agrsci.dk>
 Description: Interface package for organism protein-protein-interaction data
     packages from STRING-db.org.
-Version: 0.1.0
+Version: 0.2.0
 biocViews: AnnotationData, Software
 URL: http://code.google.com/p/r-string/
 Date: 2012-09-21
-Depends: R (>= 2.7.0), RSQLite
+Depends: R (>= 2.7.0), DBI, RSQLite, roxygen2
 Suggests: AnnotationFuncs, RUnit
-Collate: 'organisms.R' 'settings.R' 'generics.R' 'index.and.extract.R' 'makedb.R'
+Collate: 'organisms.R' 'settings.R' 'generics.R' 'index.and.extract.R' 'makedb.R' 'makepackage.R'
