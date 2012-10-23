@@ -12,7 +12,9 @@ download.flatfile <- function(version, destdir='.') {
   if (!file.exists(destdir)) dir.create(destdir)
   
   status <- download.file(ws$url, destfile=file.path(destdir, ws$fn))
-  return(status == 0)
+  res <- status == 0
+  attr(res,'fn') <- file.path(destdir, ws$fn)
+  return(res)
 }
 
 #' Indexes and extracts the protein.links flatfile.

@@ -27,6 +27,9 @@ opener <- function(fn, open='r', ...) {
 
 string.db.fn <- '%s.%s.sqlite3'
 
+#' Latest registred version of STRING-db.
+#' @export
+Latest.STRING.version <- 9.0
 
 #' Settings for downloading data from STRING website.
 #' 

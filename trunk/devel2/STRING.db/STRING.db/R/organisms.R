@@ -20,5 +20,8 @@
 #'    Loading packages etc. should be taken care of by the function.
 #'    To use BioC annotation packages to map to/from entrez, see \code{\link{ens2eg}}.
 organisms <- list()
+organisms$'001' <- list(short='T1', long='Test organism 1', primary='test')
+organisms$'002' <- list(short='T2', long='Test organism 2', primary='test')
+organisms$'003' <- list(short='T3', long='Test organism 3', primary='test')
 organisms$'9606' <- list(short='Hs', long='Homo sapiens', primary='ensembl', map2entrez=function(ppi) ens2eg(ppi, 'org.Hs.eg.db','org.Hs.egENSEMBLPROT2EG'))
 organisms$'9913' <- list(short='Bt', long='Bos taurus', primary='ensembl', map2entrez=function(ppi) ens2eg(ppi, 'org.Bt.eg.db','org.Bt.egENSEMBLPROT2EG'))
