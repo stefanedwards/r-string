@@ -10,5 +10,6 @@ Version: {package-version}
 biocViews: AnnotationData, Software
 URL: http://code.google.com/p/r-string/
 Date: {package-date}
-Depends: R (>= 2.7.0), RSQLite, STRING.db
+Depends: R (>= 2.7.0), DBI, RSQLite, STRING.db
+Imports: DBI, RSQLite
 Collate: {collate}

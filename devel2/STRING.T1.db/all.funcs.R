@@ -36,16 +36,16 @@ STRING.{organism-shortname}_dbfile <- function() dbfile(datacache)
 STRING.{organism-shortname}_organism <- '{organism-longname}'
 
 .onLoad <- function(libname, pkgname) {
-  require(RSQLite)
+  #require(RSQLite)
   dbfile <- system.file('extdata','{dbfile}', package=pkgname, lib.loc=libname, mustWork=TRUE)
   assign("dbfile", dbfile, envir=datacache)
   
-  dbconn <- dbConnect(dbDriver('SQLite'), dbfile)
+  dbconn <- DBI::dbConnect(DBI::dbDriver('SQLite'), dbfile)
   assign("dbconn", dbconn, envir=datacache)
 }
 
 .onUnload <- function(libpath) {
-  dbDisconnect(STRING.Bt_dbconn())
+  dbDisconnect(STRING.{organism-shortname}_dbconn())
 }
 
 #' Retrieve metadata on the compiled data.
@@ -59,7 +59,7 @@ STRING.{organism-shortname}_organism <- '{organism-longname}'
 # STRING.{organism-shortname}.Meta('Primary encoding')
 # STRING.{organism-shortname}.Meta('entrez%')
 STRING.{organism-shortname}.Meta <- function(key = '%') {
-  .getMeta(dbconn(datacache), key=key)
+  STRING.db:::getMeta(dbconn(datacache), key=key)
 }
 
 #' Retrieve protein-protein interactions.
