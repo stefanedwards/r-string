@@ -55,7 +55,7 @@ www.settings <- function(version) {
   }
   if (version > 8) {
     fn.base <- sprintf('protein.links.v%.1f', version)
-    res$fn.base
+    res$fn.base <- fn.base
     res$fn <- paste(fn.base, '.txt.gz', sep='')
   }
 
