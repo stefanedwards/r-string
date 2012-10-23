@@ -7,7 +7,7 @@
 \description{
   The STRING data for {organism-longname}, prepackaged with certain settings.
 }
-\usage{data{{data-name}}}
+\usage{data({data-name})}
 \format{
   A list with elements named by identifier. 
   Each element in the list is a character (or possible integer) vector of interaction partners.
@@ -23,12 +23,12 @@
       \url{http://nar.oxfordjournals.org/content/39/suppl_1/D561.long}
     
     \item Lars J. Jensen, Michael Kuhn, Manuel Stark, Samuel Chaffron, Chris Creevey, Jean Muller, Tobias Doerks, Philippe Julien, Alexander Roth, Milan Simonovic, Peer Bork, and Christian von Mering
-      \bold{STRING 8—a global view on proteins and their functional interactions in 630 organisms}
+      \bold{STRING 8 - a global view on proteins and their functional interactions in 630 organisms}
       \emph{Nucleic Acids Res.} 2009 Jan;37(Database issue):D412-6. Epub 2008 Oct 21.
       \url{http://nar.oxfordjournals.org/content/37/suppl_1/D412.long}
     
-   \item  Christian von Mering, Lars J. Jensen, Michael Kuhn, Samuel Chaffron, Tobias Doerks, Beate Krüger, Berend Snel and Peer Bork
-      \bold{STRING 7—recent developments in the integration and prediction of protein interactions}
+   \item  Christian von Mering, Lars J. Jensen, Michael Kuhn, Samuel Chaffron, Tobias Doerks, Beate Kruger, Berend Snel and Peer Bork
+      \bold{STRING 7 - recent developments in the integration and prediction of protein interactions}
       \emph{Nucleic Acids Res.} 2007 Jan;35(Database issue):D358-62. Epub 2006 Nov 10.
       \url{http://nar.oxfordjournals.org/content/35/suppl_1/D358.long}
   }
