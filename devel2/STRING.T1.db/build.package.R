@@ -55,7 +55,8 @@ replacements <- matrix(ncol=2, byrow=TRUE, dimnames=list(NULL, c('pattern','repl
                               '{organism-shortname}', organisms[[taxo]]$short,
                               '{dbfile}', sprintf(STRING.db:::string.db.fn, 'STRING',organisms[[taxo]]$short),
                               '{primary-encoding}', organisms[[taxo]]$primary,
-                              '{data-name}', cache1
+                              '{data-name}', cache1,
+                              '{rd-datapackages}', ''
                               ))
 
 for (i in 1:nrow(templates)) {
