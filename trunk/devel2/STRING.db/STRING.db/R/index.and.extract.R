@@ -40,9 +40,9 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
   #.stringAsFactors <- getOption('stringsAsFactors')
   #options(stringsAsFactors=FALSE)
   if (is.list(fn)) {
-    org.fn <- ifelse(is.null(org.fn), fn$org.fn, org.fn)
-    idx.fn <- ifelse(is.null(idx.fn), fn$idx.fn, idx.fn)
-    index.fn <- ifelse(is.null(index.fn), fn$index.fn, index.fn)
+    org.fn <-   if(is.null(org.fn)) fn$org.fn else org.fn
+    idx.fn <-   if(is.null(idx.fn)) fn$idx.fn else idx.fn
+    index.fn <- if(is.null(index.fn)) fn$index.fn else index.fn
     fn <- fn$fn
   }
   stopifnot(!is.null(fn), !is.null(idx.fn), !is.null(index.fn), !(!is.null(taxonomies) & is.null(org.fn)) ) 
@@ -54,7 +54,7 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
   
   dir.create(destdir, showWarnings=FALSE)
   prev.wd <- setwd(destdir)
-  taxo.fn <- sapply(taxonomies, org.fn)
+  taxo.fn <- sapply(as.character(taxonomies), org.fn)
   unlink(taxo.fn)
   
   ## Open connections for input file and index file.
