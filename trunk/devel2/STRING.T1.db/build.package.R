@@ -10,7 +10,7 @@ library(roxygen2)
 fn <- system.file('extdata','example.data.txt', package='STRING.db', mustWork=TRUE)
 
 package.name <- 'STRING.T1.db'
-destdir <- 'data'
+destdir <- 'tmp_data'
 taxonomies <- '001' #c('001','002','003','004')
 taxo <- '001'
 org.fn <- function(taxo) paste('test',taxo,'tab',sep='.')
@@ -42,18 +42,20 @@ for (n in ls(res))
 # make text files
 templates <- matrix(ncol=2, byrow=TRUE, dimnames=list(NULL, c('source','dest')),
                     data=c('DESCRIPTION.tpl','DESCRIPTION',
-                           'all.funcs.R', 'R/all.funcs.R'))
+                           'all.funcs.R', 'R/all.funcs.R',
+                           'data.Rd','man/data.Rd'))
 ## add scripts!
 
 replacements <- matrix(ncol=2, byrow=TRUE, dimnames=list(NULL, c('pattern','replacement')),
-                       data=c('{collate}',"'all.funcs.R",
+                       data=c('{collate}',"'all.funcs.R'",
                               '{package-version}','0.1.0',
                               '{package-date}', format(Sys.time(), "%Y-%m-%d"),
                               '{package-name}', package.name,
                               '{organism-longname}', organisms[[taxo]]$long,
                               '{organism-shortname}', organisms[[taxo]]$short,
                               '{dbfile}', sprintf(STRING.db:::string.db.fn, 'STRING',organisms[[taxo]]$short),
-                              '{primary-encoding}', organisms[[taxo]]$primary
+                              '{primary-encoding}', organisms[[taxo]]$primary,
+                              '{data-name}', cache1
                               ))
 
 for (i in 1:nrow(templates)) {
@@ -68,3 +70,9 @@ for (i in 1:nrow(templates)) {
 
 #package.skeleton(name=package.name )
 roxygenise(package.name, roclets=c('namespace','rd'))
+## add two imports to namespace
+nmsp <- file(file.path(package.name,'NAMESPACE'), 'at')
+writeLines(c('import(DBI)','import(RSQLite)'), nmsp)
+close(nmsp)
+
+
