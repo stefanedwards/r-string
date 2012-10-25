@@ -134,16 +134,16 @@ extract.flatfile <- function(fn, destdir='.', taxonomies, org.fn=NULL, idx=NULL)
 
   if (is.list(fn)) {
     org.fn <-   if(is.null(org.fn)) fn$org.fn else org.fn
-    idx.fn <-   if(is.null(idx.fn)) fn$idx.fn else idx.fn
+    idx <-   if(is.null(idx)) fn$idx.fn else idx
     fn <- fn$fn
   }
-  stopifnot(!is.null(fn), !is.null(idx.fn), !is.null(taxonomies), !is.null(org.fn))
+  stopifnot(!is.null(fn), !is.null(idx), !is.null(taxonomies), !is.null(org.fn))
   
   taxonomies <- taxonomies[order(as.integer(taxonomies))]
   fn <- normalizePath(fn, mustWork=TRUE)
   prev.wd <- setwd(destdir)
 
-  taxo.fn <- sapply(taxonomies, org.fn)
+  taxo.fn <- sapply(as.character(taxonomies), org.fn)
   unlink(taxo.fn)
   found.tax <- structure(rep(FALSE, length(taxonomies)), .Names=taxonomies)  
   
