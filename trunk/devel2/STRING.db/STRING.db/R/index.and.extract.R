@@ -131,9 +131,10 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
 #'    The tax ids in the index must also be ordered in same order as found in the protein.links flatfile.
 #' @export
 extract.flatfile <- function(fn, destdir='.', taxonomies, org.fn=NULL, idx=NULL) {
+
   if (is.list(fn)) {
-    org.fn <- ifelse(is.null(org.fn), fn$org.fn, org.fn)
-    idx.fn <- ifelse(is.null(idx.fn), fn$idx.fn, idx.fn)
+    org.fn <-   if(is.null(org.fn)) fn$org.fn else org.fn
+    idx.fn <-   if(is.null(idx.fn)) fn$idx.fn else idx.fn
     fn <- fn$fn
   }
   stopifnot(!is.null(fn), !is.null(idx.fn), !is.null(taxonomies), !is.null(org.fn))
