@@ -1,0 +1,8 @@
+citEntry(entry = "Misc",
+  author = person(given = "Stefan", family="Edwards", middle="McKinnon", email="stefan.hoj-edwards@agrsci.dk"),
+	institution,
+	year = 2011,
+	title = "R-STRING.db",
+	url = "http://www.iysik.com/index.php?page=annotation-functions",
+	note = "Published on website"
+)
