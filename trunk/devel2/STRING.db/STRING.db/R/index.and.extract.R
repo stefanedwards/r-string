@@ -37,13 +37,17 @@ download.flatfile <- function(version, destdir='.') {
 #'    as well as two index-files (binary and ordinary .RData-type, but with .idx extension.)
 #' @export
 index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn=NULL, index.fn=NULL) {
-  #.stringAsFactors <- getOption('stringsAsFactors')
-  #options(stringsAsFactors=FALSE)
+  settings <- NULL
   if (is.list(fn)) {
     org.fn <-   if(is.null(org.fn)) fn$org.fn else org.fn
     idx.fn <-   if(is.null(idx.fn)) fn$idx.fn else idx.fn
     index.fn <- if(is.null(index.fn)) fn$index.fn else index.fn
+    settings <- fn
     fn <- fn$fn
+  } else {
+    org.fn <-   if (!is.null(org.fn)) org.fn else function(tax.id) paste(fn, tax.id, 'tab', sep='.') 
+    idx.fn <-   if (!is.null(idx.fn)) idx.fn else paste(fn.base, 'idx', sep='.')
+    index.fn <- if (!is.null(index.fn)) index.fn else paste(fn.base, 'index', sep='.')
   }
   stopifnot(!is.null(fn), !is.null(idx.fn), !is.null(index.fn), !(!is.null(taxonomies) & is.null(org.fn)) ) 
   
@@ -51,6 +55,14 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
 
   ## Re-path filenames
   fn <- normalizePath(fn)
+  
+  # If file does not exist and we got the input from www.settings, we have a url to download from.
+  # So we download it.
+  if (!file.exists(fn) & !is.null(settings$url)) {
+    download.file(settings$url, fn)
+  }
+  if (!file.exists(fn))
+    stop('Input file could not be found nor downloaded!')
   
   dir.create(destdir, showWarnings=FALSE)
   prev.wd <- setwd(destdir)
