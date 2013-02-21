@@ -3,6 +3,6 @@ citEntry(entry = "Misc",
 	institution,
 	year = 2011,
 	title = "R-STRING.db",
-	url = "http://www.iysik.com/index.php?page=annotation-functions",
+	url = "http://code.google.com/p/r-string/",
 	note = "Published on website"
 )
