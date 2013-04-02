@@ -10,12 +10,15 @@
 \examples{
 destdir <- tempdir()
 fn <- system.file('extdata','example.data.txt', package='STRING.db')
-#fn <- "C:/Projects/r-string/devel2/STRING.db/STRING.db/inst/extdata/example.data.txt"
 taxonomies <- c('001','002','003')
 org.fn <- function(taxo) paste('test',taxo,'tab',sep='.')
 idx.fn <- 'text.idx'
 index.fn <- 'test.index'
 res <- index.flatfile(fn, destdir, taxonomies, org.fn, idx.fn, index.fn)
 
+\dontrun{
 # Proceed perhaps with creation of package?
+taxo <- '001'
+nm <- makePackage(tax.id=taxo, flatfile.fn=res$fn[taxo], string.v=0, cutoffs=c(800,900,950), organism=STRING.db:::organisms[[taxo]])
+}
 }

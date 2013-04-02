@@ -52,6 +52,6 @@
 }
 \seealso{
   \code{\link{known.encodings}}, \code{\link{STRING.db}},
-  \code{\link{getNames}}
+  \code{\link{getNames}}, \code{\link{getAllLinks}}
 }
 

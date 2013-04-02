@@ -46,8 +46,8 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
     fn <- fn$fn
   } else {
     org.fn <-   if (!is.null(org.fn)) org.fn else function(tax.id) paste(fn, tax.id, 'tab', sep='.') 
-    idx.fn <-   if (!is.null(idx.fn)) idx.fn else paste(fn.base, 'idx', sep='.')
-    index.fn <- if (!is.null(index.fn)) index.fn else paste(fn.base, 'index', sep='.')
+    idx.fn <-   if (!is.null(idx.fn)) idx.fn else paste(fn, 'idx', sep='.')
+    index.fn <- if (!is.null(index.fn)) index.fn else paste(fn, 'index', sep='.')
   }
   stopifnot(!is.null(fn), !is.null(idx.fn), !is.null(index.fn), !(!is.null(taxonomies) & is.null(org.fn)) ) 
   

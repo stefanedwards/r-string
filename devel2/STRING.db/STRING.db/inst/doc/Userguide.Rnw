@@ -1,7 +1,7 @@
 \documentclass[a4paper]{article}
 \usepackage{Rd}
-% \VignetteIndexEntry{Annotation mapping functions}
-% \VignetteDepends{AnnotationDbi}
+% \VignetteIndexEntry{STRING data-package-generator}
+% #\VignetteDepends{AnnotationDbi}
 
 \title{R-STRING.db - building STRING datapackages}
 \author{Stefan McKinnon Edwards \\ \email{stefan.hoj-edwards@@agrsci.dk} \\ Center of Quantitative Genetics and Genomics, Aarhus University}
@@ -35,11 +35,11 @@ The links are scored on several channels (e.g.\ experimental evidence, predictio
 
 The first couple of lines of the first mentioned file looks like this:
 \begin{verbatim}
-protein1 protein2 combined_score
-394.NGR_a00010 394.NGR_a00020 912
-394.NGR_a00010 394.NGR_a00050 854
-394.NGR_a00010 394.NGR_a00070 175
-394.NGR_a00010 394.NGR_a00080 626
+      protein1       protein2  combined_score
+394.NGR_a00010 394.NGR_a00020             912
+394.NGR_a00010 394.NGR_a00050             854
+394.NGR_a00010 394.NGR_a00070             175
+394.NGR_a00010 394.NGR_a00080             626
 \end{verbatim} 
 and some 26 mio lines later, we find the human links data:
 \begin{verbatim}
@@ -94,7 +94,7 @@ Christian~von~Mering,
 \bibitem{STRING8}
 Benjamin Lehne and Thomas Schlitt
 \newblock Protein-protein interaction databases: keeping up with growing interactomes. 
-\newblock {\em Human genomics 3}, 291–7 (2009).
+\newblock {\em Human genomics 3}, 291???7 (2009).
 
 \end{thebibliography}
 
