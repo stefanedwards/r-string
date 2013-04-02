@@ -58,20 +58,25 @@
 NULL
 
 
-
-#require(RSQLite)
-#require(STRING.db)
-
 datacache <- new.env(hash=TRUE, parent=emptyenv())
 
-# methods from AnnDbObj-lowAPI.R in AnnotationDbi
-#setMethod("dbconn", "environment", function(x) get("dbconn", envir=x))
-#setMethod("dbfile", "environment", function(x) get("dbfile", envir=x))
+
 dbconn <- function(x) get('dbconn', envir=x)
 dbfile <- function(x) get('dbfile', envir=x)
 
-# and we continue on our own
+#' Direct access to package DB
+#' 
+#' Some convenience functions for getting a connection to the behind-the-scene database or just the file name.
+#' @return \code{STRING.{organism-shortname}_dbconn}: The active connection to the sqlite file.
+#'      \code{STRING.{organism-shortname}_dbfile}: Path to the file.
+#' @export
+#' @seealso \link[DBI:dbSendQuery]{dbSendQuery}
+#' @examples
+#' # Path to sqlite database file:
+#' STRING.{organism-shortname}_dbfile()
 STRING.{organism-shortname}_dbconn <- function() dbconn(datacache)
+#' @aliases(STRING.{organism-shortname}_dbconn)
+#' @export
 STRING.{organism-shortname}_dbfile <- function() dbfile(datacache)
 
 STRING.{organism-shortname}_organism <- '{organism-longname}'
