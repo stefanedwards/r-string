@@ -75,7 +75,7 @@ dbfile <- function(x) get('dbfile', envir=x)
 #' # Path to sqlite database file:
 #' STRING.{organism-shortname}_dbfile()
 STRING.{organism-shortname}_dbconn <- function() dbconn(datacache)
-#' @aliases(STRING.{organism-shortname}_dbconn)
+#' @rdname STRING.{organism-shortname}_dbconn
 #' @export
 STRING.{organism-shortname}_dbfile <- function() dbfile(datacache)
 
