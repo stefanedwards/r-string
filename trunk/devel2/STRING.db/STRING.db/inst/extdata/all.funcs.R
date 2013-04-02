@@ -145,11 +145,11 @@ STRING.{organism-shortname}.Names <- function(encoding="{primary-encoding}", fil
 #' Retrieve all protein-protein interactions
 #' 
 #' @param encoding String of which encoding \code{proteins} is set in. Defaults to primary encoding.
-#'        Default \code{NULL} for no filtering, i.e. retrieve all names.
+#' @param cutoff Cut-off of score, i.e. get all links with score greater than or equal to.
 # @author Stefan McKinnon Edwards \email{stefan.hoj-edwards@@agrsci.dk}
 #' @return data.frame with three columns.
 #' @seealso \code{\link{STRING.{organism-shortname}.Names}}, \code{\link{STRING.{organism-shortname}.PPI}}
 #' @export
-STRING.{organism-shortname}.Table <- function(encoding="{primary-encoding}") {
-  STRING.db::getAllLinks(conn=dbconn(datacache), encoding=encoding)
+STRING.{organism-shortname}.Table <- function(encoding="{primary-encoding}", cutoff=0) {
+  STRING.db::getAllLinks(conn=dbconn(datacache), encoding=encoding, cutoff)
 }
