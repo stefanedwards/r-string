@@ -70,7 +70,7 @@ dbfile <- function(x) get('dbfile', envir=x)
 #' @return \code{STRING.{organism-shortname}_dbconn}: The active connection to the sqlite file.
 #'      \code{STRING.{organism-shortname}_dbfile}: Path to the file.
 #' @export
-#' @seealso \link[DBI:dbSendQuery]{dbSendQuery}
+#' @seealso \code{\link{STRING.{organism-shortname}.Meta}}, \link[DBI:dbSendQuery]{dbSendQuery}
 #' @examples
 #' # Path to sqlite database file:
 #' STRING.{organism-shortname}_dbfile()
@@ -101,6 +101,7 @@ STRING.{organism-shortname}_organism <- '{organism-longname}'
 #' @param as.bool Coerce result into logical. Useful if requesting known keys.
 #' @return List with entries named by the key; return value is reduced to character vector if only one key is retrieved.
 #' @author Stefan McKinnon Edwards \email{stefan.hoj-edwards@@agrsci.dk}
+#' @seealso \code{\link[STRING.{organism-shortname}_dbconn]{dbconn}}
 #' @export
 # @examples
 # STRING.{organism-shortname}.Meta('Primary encoding')
@@ -120,6 +121,7 @@ STRING.{organism-shortname}.Meta <- function(key = '%', as.bool=FALSE) {
 #'         For \code{as.list} as \code{TRUE}, list with entries named by \code{g1} containing all mappings in \code{g2}. \code{score} is lost.
 #'         If \code{simplify} is \code{TRUE}, \code{as.list} is overruled and the returned value is a character vector.
 #' @author Stefan McKinnon Edwards \email{stefan.hoj-edwards@@agrsci.dk}
+#' @seealso \code{\link{STRING.{organism-shortname}.Names}}, \code{\link{STRING.{organism-shortname}.Table}}
 #' @export
 # @example STRING.Bt.PPI('ENSBTAP00000000017')
 STRING.{organism-shortname}.PPI <- function(proteins, cutoff=900, encoding="{primary-encoding}", as.list=FALSE, simplify=FALSE) {
@@ -134,8 +136,20 @@ STRING.{organism-shortname}.PPI <- function(proteins, cutoff=900, encoding="{pri
 #'        Default \code{NULL} for no filtering, i.e. retrieve all names.
 # @author Stefan McKinnon Edwards \email{stefan.hoj-edwards@@agrsci.dk}
 #' @return data.frame with one column.
+#' @seealso \code{\link{STRING.{organism-shortname}.PPI}}, \code{\link{STRING.{organism-shortname}.Table}}
 #' @export
 STRING.{organism-shortname}.Names <- function(encoding="{primary-encoding}", filter=NULL) {
   STRING.db::getNames(conn=dbconn(datacache), encoding=encoding, filter=filter)
 }
 
+#' Retrieve all protein-protein interactions
+#' 
+#' @param encoding String of which encoding \code{proteins} is set in. Defaults to primary encoding.
+#'        Default \code{NULL} for no filtering, i.e. retrieve all names.
+# @author Stefan McKinnon Edwards \email{stefan.hoj-edwards@@agrsci.dk}
+#' @return data.frame with three columns.
+#' @seealso \code{\link{STRING.{organism-shortname}.Names}}, \code{\link{STRING.{organism-shortname}.PPI}}
+#' @export
+STRING.{organism-shortname}.Table <- function(encoding="{primary-encoding}") {
+  STRING.db::getAllLinks(conn=dbconn(datacache), encoding=encoding)
+}

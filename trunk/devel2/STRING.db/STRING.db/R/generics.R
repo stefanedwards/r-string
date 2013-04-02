@@ -87,7 +87,7 @@ getMeta.0.2 <- function(conn, key) {
 #'         For \code{as.list} as \code{TRUE}, list with entries named by \code{g1} containing all mappings in \code{g2}. \code{score} is lost.
 #'         If \code{simplify} is \code{TRUE}, \code{as.list} is overruled and the returned value is a character vector.
 #' @author Stefan McKinnon Edwards \email{stefan.hoj-edwards@@agrsci.dk}
-#' @seealso \code{\link{known.encodings}}, \code{\link{STRING.db}}, \code{\link{getNames}}
+#' @seealso \code{\link{known.encodings}}, \code{\link{STRING.db}}, \code{\link{getNames}}, \code{\link{getAllLinks}}
 #' @export
 getPPI <- function(conn, proteins, cutoff, encoding, as.list, simplify) {
   db.schema <- getDBSchema(conn)
@@ -157,6 +157,7 @@ getPPI.0.2 <- function(conn, proteins, cutoff, encoding, as.list, simplify) {
 #' @param filter Character for filtering which names to retrieve; uses sqlite i.e. use \sQuote{\%} for any length wildcard, \sQuote{_} for single character wildcard.
 # @author Stefan McKinnon Edwards \email{stefan.hoj-edwards@@agrsci.dk}
 #' @return data.frame with one column.
+#' @seealso \link{getPPI}, \link{getAllLinks}
 #' @export
 getNames <- function(conn, encoding, filter=NULL) {
   db.schema <- getDBSchema(conn)
@@ -202,6 +203,42 @@ getNames.0.2 <- function(conn, encoding, filter) {
   }
 }
 
+#' Generic function for getting all protein-protein links
+#' 
+#' \code{getAllLinks.x.y} are database schema dependant functions for doing the actual work.
+#' 
+#' @param conn Database connection to STRING.db-sqlite database.
+#' @param encoding String of which encoding \code{proteins} is set in. Defaults to primary encoding.
+# @author Stefan McKinnon Edwards \email{stefan.hoj-edwards@@agrsci.dk}
+#' @return data.frame with three columns.
+#' @seealso \link{getNames}, \link{getPPI}
+#' @export
+getAllLinks <- function(conn, encoding) {
+  db.schema <- getDBSchema(conn)
+  if (db.schema >= 0.2) {
+    res <- getAllLinks.0.2(conn, encoding)
+  } else {
+    stop('This function is not supported in this database schema.')
+  }
+  return(res)
+}
+#' @rdname getAllLinks
+#' @inheritParams getAllLinks
+getAllLinks.0.2 <- function(conn, encoding) {
+  has.enc <- getMeta(conn, encoding, as.bool=TRUE)
+  if (has.enc != TRUE) stop(paste('Encoding `', encoding, '` is not listed in meta-table.', sep=''))
+
+  tbl.id <- paste(encoding, '_ids', sep='')
+  if (!tbl.id %in% dbListTables(conn)) {
+    sql <- sprintf('SELECT id1, id2, score FROM %s ORDER BY id1, id2;', encoding)
+  } else {
+    sql <- sprintf('SELECT g1.gene as id1, g2.gene as id2, score FROM %1$s INNER JOIN %2$s AS g1 ON g1.id=id1 INNER JOIN %2$s AS g2 ON g2.id=id2 ORDER BY id1, id2;', encoding, tbl.id)
+  }
+  
+  res <- dbGetQuery(conn, sql)
+  
+  return(res)
+}
 
 #' Prepares a data object with all data.
 #' 
@@ -221,7 +258,7 @@ makeCache <- function(conn, encoding, cutoff) {
   
   tbl.id <- paste(encoding, '_ids', sep='')
   if (!tbl.id %in% dbListTables(conn)) {
-    sql <- sprintf('SELECT id1, id2, score FROM %s WHERE score >= @score AND id1 = @id1 ORDER BY id1, id2;', encoding)
+    sql <- sprintf('SELECT id1, id2 FROM %s WHERE score >= @score ORDER BY id1, id2;', encoding)
   } else {
     sql <- sprintf('SELECT g1.gene as id1, g2.gene as id2 FROM %1$s INNER JOIN %2$s AS g1 ON g1.id=id1 INNER JOIN %2$s AS g2 ON g2.id=id2 WHERE score >= @score ORDER BY id1, id2;', encoding, tbl.id)
   }
