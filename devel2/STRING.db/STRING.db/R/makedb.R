@@ -26,6 +26,7 @@ make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL, string.v=
   meta['primary'] <- organism$primary
   meta[organism$primary] <- 'TRUE'
   meta['Organism'] <- organism$long
+  meta['Built by'] <-  package.description("STRING.db")["Version"]
   meta['DB Schema'] <- 0.2 
     ## 0.1 was on emphasis on primary encoding, e.g. geneids and ppi.
     ## 0.2 is more flexible, as the table naming is dependant on encoding.
