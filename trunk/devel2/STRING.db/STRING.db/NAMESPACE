@@ -1,4 +1,5 @@
 export(cacheObject)
+export(download.flatfile)
 export(extract.flatfile)
 export(fmt.v)
 export(getAllLinks)
