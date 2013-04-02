@@ -5,7 +5,8 @@
 #' @param version Integer or numeric of STRING version.
 #' @param destdir Destination directory for file.
 #' @return Logical for success.
-# @author  Stefan McKinnon Edwards  \email{stefan.hoj-edwards@@agrsci.dk}
+#' @author  Stefan McKinnon Edwards  \email{stefan.hoj-edwards@@agrsci.dk}
+#' @export
 download.flatfile <- function(version, destdir='.') {
   ws <- www.settings(version)
   
