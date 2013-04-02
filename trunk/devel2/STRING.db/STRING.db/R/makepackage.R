@@ -24,7 +24,7 @@ makePackage <- function(tax.id, flatfile.fn, string.v, cutoffs=c(800,900,950), o
   sapply(subdirs, function(x) dir.create(file.path(package.name, x), recursive=TRUE))
   
   # Make Database
-  conn <- make.sqlite(tax.id, res$fn[tax.id], sqlite.fn=file.path(package.name, 'inst/extdata', sprintf(STRING.db:::string.db.fn, 'STRING',organism$short)), organism=organism, string.v=string.v)
+  conn <- make.sqlite(tax.id, flatfile.fn, sqlite.fn=file.path(package.name, 'inst/extdata', sprintf(STRING.db:::string.db.fn, 'STRING',organism$short)), organism=organism, string.v=string.v)
 
   # Make data-files
   for (cutoff in cutoffs) {
