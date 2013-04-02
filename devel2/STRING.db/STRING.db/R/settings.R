@@ -29,7 +29,7 @@ string.db.fn <- '%s.%s.sqlite3'
 
 #' Latest registred version of STRING-db.
 #' @export
-Latest.STRING.version <- 9.0
+Latest.STRING.version <- 9.05
 
 #' Settings for downloading data from STRING website.
 #' 
@@ -50,11 +50,17 @@ www.settings <- function(version) {
 
   res <- list()
 
-  if (version == 9) {
+  if (version == 9.05) {
     res$url <- 'http://string-db.org/newstring_download' 
+  } else if (version == 9) {
+    res$url <- 'http://string90.embl.de/newstring_download'
+  } else if (version == 8.3) {
+    res$url <- 'http://string83.embl.de/newstring_download'
+  } else if (version == 8.2) {
+    res$url <- 'http://string82.embl.de/newstring_download'
   }
   if (version > 8) {
-    fn.base <- sprintf('protein.links.v%.1f', version)
+    fn.base <- sprintf('protein.links.v%s', version)
     res$fn.base <- fn.base
     res$fn <- paste(fn.base, '.txt.gz', sep='')
   }
