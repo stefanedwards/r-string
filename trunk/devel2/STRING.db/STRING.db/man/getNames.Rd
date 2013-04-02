@@ -28,4 +28,7 @@
   \code{getNames.x.y} are database schema dependant
   functions for doing the actual work.
 }
+\seealso{
+  \link{getPPI}, \link{getAllLinks}
+}
 

@@ -27,9 +27,8 @@
   Defaults to STRING.[abbr].db.}
 }
 \description{
-  Takes the extracted data by
-  \code{\link{index.flatfile}} or
-  \code{\link{extract.flatfile}} and compiles it into a
+  Takes the extracted data by \code{\link{index.flatfile}}
+  or \code{\link{extract.flatfile}} and compiles it into a
   ready-to-use package for R.
 }
 
