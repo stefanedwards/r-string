@@ -3,9 +3,12 @@
 #PBS -N Build.STRING
 #PBS -j oe
 
-library(STRING.db)
 
 setwd(Sys.getenv('PBS_O_WORKDIR', '.'))
+
+install.packages('STRING.db', repos=NULL)
+library(STRING.db)
+
 
 string.v <- 9.05
 settings <- www.settings(string.v)
@@ -21,6 +24,15 @@ if (!all(file.exists(org.fn))) {
   }
 }
 
-for (taxo in taxonomies) {
-  makePackage(taxo, settings$org.fn(taxo), string.v)
-}
+#for (taxo in taxonomies) {
+taxo <- '9913'
+  organism <- STRING.db:::organisms[[taxo]]
+  organism$ens2eg <- organism$map2entrez
+  nm <- makePackage(taxo, settings$org.fn(taxo), string.v=string.v, organism=organism)
+
+  conn <- dbConnect(dbDriver('SQLite'), file.path(nm, 'inst/extdata', sprintf(STRING.db:::string.db.fn, 'STRING',organism$short)))
+  ppi <- STRING.db::getAllLinks(conn, 'ensembl')
+  STRING.db:::make.entrez.table(conn, ppi, organism$map2entrez)
+  
+  install.packages(nm, repos=NULL, INSTALL_opts=c('--resave-data', '--build'))
+#}
