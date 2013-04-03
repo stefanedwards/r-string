@@ -34,7 +34,7 @@ make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL, string.v=
     ## 0.2 is more flexible, as the table naming is dependant on encoding.
   
   # Read raw data
-  message(" * reading raw ppi data from flatfile ", flatfile.fn"...\n")
+  message(" * reading raw ppi data from flatfile ", flatfile.fn, "...\n")
   ppi <- read.table(flatfile.fn, header=FALSE, col.names=c('id1','id2','score'), as.is=TRUE)
   write.ppi.table(conn, ppi, organism$primary)
   
@@ -60,7 +60,7 @@ make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL, string.v=
 #' @export
 make.entrez.table <- function(conn, ppi, func) {
   message(" * mapping extra entrez encoding...\n")
-  ppi.ens <- organism$map2entrez(ppi)
+  ppi.ens <- func(ppi)
   if (ppi.ens != FALSE) {
     message(" * got entrez, will try to write it...\n")
     write.ppi.table(conn, ppi.ens, 'entrez')
