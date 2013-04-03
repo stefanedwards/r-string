@@ -87,27 +87,33 @@ www.settings <- function(version) {
 #' 
 #' @param ppi data.frame with three columns, id1, id2 and score. First two columns must be character vectors of the names.
 #' @param db Name of BioC annotation package for mapping, e.g. org.Bt.eg.db.
-#' @param obj Name of BioC map, e.g. org.Bt.egENSEMBLPROT2EG.
+#' @param keytype Name of BioC keytype, e.g. \code{ENSEMBLPROT}, see \code{\link[AnnotationDbi:AnnotationDb-class]{cols}}.
+#' @param cols Name of destination keytype, e.g. \code{ENTREZID}.
 #' @return New data.frame with same names and type, but with the two first columns replaced with entrez identifiers.
 #' @author  Stefan McKinnon Edwards  \email{stefan.hoj-edwards@@agrsci.dk}
-ens2eg <- function(ppi, db, obj) {
+ens2eg <- function(ppi, db, keytype, cols) {
   .stringAsFactors <- getOption('stringAsFactors')
   options(stringAsFactors=FALSE)
-  require(AnnotationFuncs)
   require(db, character.only=TRUE)
   
-  ens2ent <- AnnotationFuncs::translate(ppi[,1:2], get(obj), return.list=FALSE)
-  ens2ent$from <- as.character(ens2ent$from)
-  ens2ent$to <- as.integer(ens2ent$to)
+  #ens2ent <- AnnotationFuncs::translate(ppi[,1:2], get(obj), return.list=FALSE)
+  #ens2ent$from <- as.character(ens2ent$from)
+  #ens2ent$to <- as.integer(ens2ent$to)
   
-  ppi.entrez <- merge(ppi, ens2ent, by.x='id1', by.y='from', all.x=FALSE, all.y=FALSE) #ENSBTAP00000000230
+  k <- unique(c(ppi[,1], ppi[,2]))
+  ens2ent <- select(get(db), keys=k, keytype=keytype, cols=cols)
+  ens2ent <- ens2ent[!is.na(ens2ent[,2]),]
+  ens2ent$ENTREZID <- as.integer(ens2ent$ENTREZID)
+  
+  
+  ppi.entrez <- merge(ppi, ens2ent, by.x='id1', by.y=keytype, all.x=FALSE, all.y=FALSE) #ENSBTAP00000000230
   ppi.entrez$id1 <- NULL
-  names(ppi.entrez)[names(ppi.entrez) == 'to'] <- 'id1'
+  names(ppi.entrez)[names(ppi.entrez) == cols] <- 'id1'
   
   
-  ppi.entrez <- merge(ppi.entrez, ens2ent, by.x='id2', by.y='from', all.x=FALSE, all.y=FALSE) #ENSBTAP00000000230
+  ppi.entrez <- merge(ppi.entrez, ens2ent, by.x='id2', by.y=keytype, all.x=FALSE, all.y=FALSE) #ENSBTAP00000000230
   ppi.entrez$id2 <- NULL # 5702 5871
-  names(ppi.entrez)[names(ppi.entrez) == 'to'] <- 'id2'
+  names(ppi.entrez)[names(ppi.entrez) == cols] <- 'id2'
   
   attr(ppi.entrez, 'meta') <- data.frame(meta=c('entrez version','entrez source'), 
                                          value=c(packageVersion(db), db) )
