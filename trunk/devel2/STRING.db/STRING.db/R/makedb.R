@@ -16,16 +16,16 @@ make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL, string.v=
   
   require(RSQLite)
   
-  message(" * removing any previous sqlite-files...\n")
+  message(" * removing any previous sqlite-files...")
   unlink(sqlite.fn)
   
-  message(" * new sqlite-file created: ", sqlite.fn, "\n")
+  message(" * new sqlite-file created: ", sqlite.fn)
   conn <- dbConnect(dbDriver('SQLite'), sqlite.fn)
   
   meta <- vector('character')
   meta['Created'] <- date()
   if (!is.null(string.v)) meta['STRING-db'] <- string.v
-  meta['primary'] <- organism$primary
+  #meta['primary'] <- organism$primary
   meta[organism$primary] <- 'TRUE'
   meta['Organism'] <- organism$long
   meta['Built by'] <-  as.character(packageVersion('STRING.db'))
@@ -34,8 +34,9 @@ make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL, string.v=
     ## 0.2 is more flexible, as the table naming is dependant on encoding.
   
   # Read raw data
-  message(" * reading raw ppi data from flatfile ", flatfile.fn, "...\n")
+  message(" * reading raw ppi data from flatfile ", flatfile.fn, "...")
   ppi <- read.table(flatfile.fn, header=FALSE, col.names=c('id1','id2','score'), as.is=TRUE)
+  message(" * writing primary ppi to sqlite...")
   write.ppi.table(conn, ppi, organism$primary)
   
   #if (!is.null(organism$map2entrez)) {
@@ -51,7 +52,7 @@ make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL, string.v=
   #}
   
   ## Write meta table
-  message(" * finishing with the database...\n")
+  message(" * finishing with the database...")
   dbWriteTable(conn, 'meta', data.frame(key=names(meta), value=unlist(meta), stringsAsFactors=FALSE), append=TRUE, overwrite=FALSE, row.names=FALSE)
   
   return(conn)
@@ -59,12 +60,11 @@ make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL, string.v=
 
 #' @export
 make.entrez.table <- function(conn, ppi, func) {
-  message(" * mapping extra entrez encoding...\n")
+  message(" * mapping extra entrez encoding...")
   ppi.ens <- func(ppi)
-  if (ppi.ens != FALSE) {
-    message(" * got entrez, will try to write it...\n")
+  if (length(ppi) == 1) {#(ppi.ens != FALSE) {
+    message(" * got entrez, will try to write it...")
     write.ppi.table(conn, ppi.ens, 'entrez')
-    meta['entrez'] <- 'TRUE'
     if (!is.null(attr(ppi.ens, 'meta'))) 
       dbWriteTable(conn, 'meta', attr(ppi.ens, 'meta'), append=TRUE, overwrite=FALSE, row.names=FALSE)
   }
@@ -105,6 +105,7 @@ write.ppi.table <- function(conn, ppi, encoding) {
   dbSendQuery(conn, sprintf('CREATE INDEX `IDX_%s_id1` ON `%s` (`id1`);', encoding, encoding))
   #dbSendQuery(conn, 'CREATE UNIQUE INDEX `IDX_ppi` ON `ppi` (`id1`,`id2`);')
   dbSendQuery(conn, sprintf('CREATE INDEX `IDX_%s_score` ON `%s` (`score`);', encoding, encoding))
+  dbSendQuery(conn, 'INSERT INTO meta SET `key`="primary", `value`=?;', data.frame(encoding))
 }
 
 #' Creates a data-object with a given variable name.
