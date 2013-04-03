@@ -74,9 +74,9 @@ makePackage <- function(tax.id, flatfile.fn, string.v, cutoffs=c(800,900,950), o
   
   roxygenise(package.name, roclets=c('namespace','rd'))
   ## add two imports to namespace
-  nmsp <- file(file.path(package.name,'NAMESPACE'), 'at')
-  writeLines(c('import(DBI)','import(RSQLite)'), nmsp)
-  close(nmsp)
+  #nmsp <- file(file.path(package.name,'NAMESPACE'), 'at')
+  #writeLines(c('import(DBI)','import(RSQLite)'), nmsp)
+  #close(nmsp)
 
   return(package.name)
 }

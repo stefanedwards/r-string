@@ -44,6 +44,7 @@
 #'     \url{http://nar.oxfordjournals.org/content/35/suppl_1/D358.long}
 #'   }
 #' @keywords  package
+#' @import AnnotationDbi
 #' @examples
 #' # Inspect meta data:
 #' STRING.{organism-shortname}.Meta()
@@ -71,6 +72,7 @@ dbfile <- function(x) get('dbfile', envir=x)
 #'      \code{STRING.{organism-shortname}_dbfile}: Path to the file.
 #' @export
 #' @seealso \code{\link{STRING.{organism-shortname}.Meta}}, \link[DBI:dbSendQuery]{dbSendQuery}
+#' @rdname STRING.{organism-shortname}_dbconn
 #' @examples
 #' # Path to sqlite database file:
 #' STRING.{organism-shortname}_dbfile()
@@ -86,7 +88,7 @@ STRING.{organism-shortname}_organism <- '{organism-longname}'
   dbfile <- system.file('extdata','{dbfile}', package=pkgname, lib.loc=libname, mustWork=TRUE)
   assign("dbfile", dbfile, envir=datacache)
   
-  dbconn <- DBI::dbConnect(DBI::dbDriver('SQLite'), dbfile)
+  dbconn <- dbFileConnect(dbfile)
   assign("dbconn", dbconn, envir=datacache)
 }
 
