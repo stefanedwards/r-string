@@ -91,6 +91,7 @@ www.settings <- function(version) {
 #' @param cols Name of destination keytype, e.g. \code{ENTREZID}.
 #' @return New data.frame with same names and type, but with the two first columns replaced with entrez identifiers.
 #' @author  Stefan McKinnon Edwards  \email{stefan.hoj-edwards@@agrsci.dk}
+#' @export
 ens2eg <- function(ppi, db, keytype, cols) {
   .stringAsFactors <- getOption('stringAsFactors')
   options(stringAsFactors=FALSE)
@@ -116,7 +117,7 @@ ens2eg <- function(ppi, db, keytype, cols) {
   names(ppi.entrez)[names(ppi.entrez) == cols] <- 'id2'
   
   attr(ppi.entrez, 'meta') <- data.frame(meta=c('entrez version','entrez source'), 
-                                         value=c(packageVersion(db), db) )
+                                         value=c(as.character(packageVersion(db)), db) )
   
   options(stringAsFactors=.stringAsFactors)
   return(ppi.entrez)
