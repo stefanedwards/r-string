@@ -17,6 +17,7 @@ makePackage <- function(tax.id, flatfile.fn, string.v, cutoffs=c(800,900,950), o
   if (is.null(organism)) stop(paste('Could not fetch any organism specifics for',tax.id,'from `organisms`.'))
   
   if (is.null(package.name)) package.name <- paste('STRING',organism$short, 'db', sep='.')
+  message("\nMaking package ", package.name, '...\n')
   
   # Create directories
   dir.create(package.name)
@@ -24,9 +25,11 @@ makePackage <- function(tax.id, flatfile.fn, string.v, cutoffs=c(800,900,950), o
   sapply(subdirs, function(x) dir.create(file.path(package.name, x), recursive=TRUE))
   
   # Make Database
+  message(" * building database...\n")
   conn <- make.sqlite(tax.id, flatfile.fn, sqlite.fn=file.path(package.name, 'inst/extdata', sprintf(STRING.db:::string.db.fn, 'STRING',organism$short)), organism=organism, string.v=string.v)
 
   # Make data-files
+  message(" * compiling data-caches...\n")
   for (cutoff in cutoffs) {
     cache <- paste(organism$short, cutoff, 'PPI', sep='.')
     res <- cacheObject(conn, encoding=organism$primary, cutoff=cutoff, var.name=cache)
@@ -34,6 +37,7 @@ makePackage <- function(tax.id, flatfile.fn, string.v, cutoffs=c(800,900,950), o
   }
 
   # make script files
+  message(" * making script files...\n")
   templates <- matrix(ncol=2, byrow=TRUE, dimnames=list(NULL, c('source','dest')),
                       data=c('DESCRIPTION.tpl','DESCRIPTION',
                              'all.funcs.R', 'R/all.funcs.R',
@@ -72,12 +76,10 @@ makePackage <- function(tax.id, flatfile.fn, string.v, cutoffs=c(800,900,950), o
     writeLines(tpl, file.path(package.name, 'man', paste(organism$short, cutoff, 'PPI.Rd', sep='.')))
   }
   
+  message(" * roxygenising...\n")
   roxygenise(package.name, roclets=c('namespace','rd'))
-  ## add two imports to namespace
-  #nmsp <- file(file.path(package.name,'NAMESPACE'), 'at')
-  #writeLines(c('import(DBI)','import(RSQLite)'), nmsp)
-  #close(nmsp)
 
+  message(" * <<happy message!>>\n")
   return(package.name)
 }
 
