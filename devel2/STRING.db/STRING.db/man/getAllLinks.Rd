@@ -3,7 +3,7 @@
 \alias{getAllLinks.0.2}
 \title{Generic function for getting all protein-protein links}
 \usage{
-  getAllLinks(conn, encoding, cutoff)
+  getAllLinks(conn, encoding, cutoff = 0)
 
   getAllLinks.0.2(conn, encoding, cutoff)
 }

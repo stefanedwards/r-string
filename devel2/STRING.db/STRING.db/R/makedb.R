@@ -26,7 +26,7 @@ make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL, string.v=
   meta['primary'] <- organism$primary
   meta[organism$primary] <- 'TRUE'
   meta['Organism'] <- organism$long
-  meta['Built by'] <-  package.description("STRING.db")["Version"]
+  meta['Built by'] <-  as.character(packageVersion('STRING.db'))
   meta['DB Schema'] <- 0.2 
     ## 0.1 was on emphasis on primary encoding, e.g. geneids and ppi.
     ## 0.2 is more flexible, as the table naming is dependant on encoding.
@@ -35,8 +35,8 @@ make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL, string.v=
   ppi <- read.table(flatfile.fn, header=FALSE, col.names=c('id1','id2','score'), as.is=TRUE)
   write.ppi.table(conn, ppi, organism$primary)
   
-  if (!is.null(organism$ens2eg)) {
-    ppi.ens <- organism$ens2eg(ppi)
+  if (!is.null(organism$map2entrez)) {
+    ppi.ens <- organism$map2entrez(ppi)
     if (ppi.ens != FALSE) {
       write.ppi.table(conn, ppi.ens, 'entrez')
       meta['entrez'] <- 'TRUE'
@@ -46,7 +46,7 @@ make.sqlite <- function(tax.id, flatfile.fn, sqlite.fn, organism=NULL, string.v=
   }
   
   ## Write meta table
-  dbWriteTable(conn, 'meta', data.frame(key=names(meta), value=meta), append=TRUE, overwrite=FALSE, row.names=FALSE)
+  dbWriteTable(conn, 'meta', data.frame(key=names(meta), value=unlist(meta), stringsAsFactors=FALSE), append=TRUE, overwrite=FALSE, row.names=FALSE)
   
   return(conn)
 }

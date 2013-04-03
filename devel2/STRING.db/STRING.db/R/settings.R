@@ -110,7 +110,7 @@ ens2eg <- function(ppi, db, obj) {
   names(ppi.entrez)[names(ppi.entrez) == 'to'] <- 'id2'
   
   attr(ppi.entrez, 'meta') <- data.frame(meta=c('entrez version','entrez source'), 
-                                         value=c(read.dcf(system.file('DESCRIPTION',package=db), 'Version'), db) )
+                                         value=c(packageVersion(db), db) )
   
   options(stringAsFactors=.stringAsFactors)
   return(ppi.entrez)
