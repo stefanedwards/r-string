@@ -9,7 +9,8 @@ setwd(Sys.getenv('PBS_O_WORKDIR', '.'))
 
 string.v <- 9.05
 settings <- www.settings(string.v)
-taxonomies <- c('9913','9606')
+#taxonomies <- c('9913','9606')
+taxonomies <- '7227'
 destdir <- '.'
 org.fn <- sapply(taxonomies, settings$org.fn)
 if (!all(file.exists(org.fn))) {
@@ -22,5 +23,8 @@ if (!all(file.exists(org.fn))) {
 }
 
 for (taxo in taxonomies) {
-  makePackage(taxo, settings$org.fn(taxo), string.v)
+  nm <- makePackage(taxo, settings$org.fn(taxo), string.v)
+  conn <- dbConnect(dbDriver('SQLite'), file.path(nm, 'inst/extdata', sprintf(STRING.db:::string.db.fn, 'STRING', STRING.db:::organisms[[taxo]]$short)))
+  ppi <- STRING.db::getAllLinks(conn, 'ensembl')
+  STRING.db:::make.entrez.table(conn, ppi, STRING.db:::organisms[[taxo]]$map2entrez)
 }
