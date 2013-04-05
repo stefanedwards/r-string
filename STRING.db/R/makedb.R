@@ -109,6 +109,7 @@ write.ppi.table <- function(conn, ppi, encoding) {
   #dbSendQuery(conn, 'CREATE UNIQUE INDEX `IDX_ppi` ON `ppi` (`id1`,`id2`);')
   dbSendQuery(conn, sprintf('CREATE INDEX `IDX_%s_score` ON `%s` (`score`);', encoding, encoding))
   dbSendQuery(conn, 'INSERT INTO meta (`key`,`value`) VALUES (?, "TRUE");', data.frame(encoding))
+  dbSendQuery(conn, 'INSERT INTO meta (`key`,`value`) VALUES ("encodings", ?);', data.frame(encoding))
 }
 
 #' Creates a data-object with a given variable name.
