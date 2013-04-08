@@ -1,1 +1,0 @@
-FOR %%P IN (STRING.db, STRING.Bt.db, STRING.Hs.db) DO   R CMD INSTALL --build --resave-data %%P
