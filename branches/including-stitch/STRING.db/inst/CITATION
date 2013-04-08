@@ -1,0 +1,8 @@
+citEntry(entry = "Misc",
+  author = person(given = "Stefan", family="Edwards", middle="McKinnon", email="stefan.hoj-edwards@agrsci.dk"),
+	institution,
+	year = 2011,
+	title = "R-STRING.db: Packaging of STRING-db.org for R",
+	url = "http://code.google.com/p/r-string/",
+	note = "Published on website"
+)
