@@ -6,7 +6,7 @@ Title: STRING-db creation utility and database interface package
 Author: Stefan McKinnon Edwards <stefan.hoj-edwards@agrsci.dk>
 Description: Interface package for organism protein-protein-interaction data
     packages from STRING-db.org.
-Version: 0.2.1
+Version: 0.3.0
 biocViews: AnnotationData, Software
 URL: http://code.google.com/p/r-string/
 Date: 2012-09-21

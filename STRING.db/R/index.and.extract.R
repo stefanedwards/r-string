@@ -37,7 +37,13 @@ download.flatfile <- function(version, destdir='.') {
 #'    Will create a new file in \code{destdir} for each found tax id in \code{taxonomies},
 #'    as well as two index-files (binary and ordinary .RData-type, but with .idx extension.)
 #' @export
-index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn=NULL, index.fn=NULL) {
+#' @aliases index.flatfile
+index.flatfile <- function(fn, taxonomies, destdir='.') {
+  UseMethod('index.flatfile', fn)
+}
+index.flatfile.list <- function(fn, taxonomies, destdir='.')
+  
+index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn=NULL, index.fn=NULL, chem.prot=FALSE) {
   settings <- NULL
   if (is.list(fn)) {
     org.fn <-   if(is.null(org.fn)) fn$org.fn else org.fn
@@ -81,8 +87,42 @@ index.flatfile <- function(fn, destdir='.', taxonomies=NULL, org.fn=NULL, idx.fn
   idx <- vector('integer')  # for binary dataset
   found.tax <- structure(rep(FALSE, length(taxonomies)), .Names=taxonomies)
 
+  
+  #taxo.fn <- sapply(taxo.fn, opener, open='wt')  
+  input <- c("CID105464255\t323097.Nham_0164\t478", "CID105464255\t323098.Nwi_0208\t481", "CID105464255\t323261.Noc_0179\t491")
+  strsplit(input, 'CI(D)')
+  tax.column <- if (chem.prot) 2 else 1
+  tax.columns <- if (chem.prot) 2 else c(1,3)
+  require(stringr)
+  
   # Main loop for reading
   while (length(input <- readLines(ppi.f, n=60000)) > 0) {
+    cols <- strsplit(input, '\t')
+    lapply(cols, function(s) unlist(strsplit(s, '(?!^[0-9]*)\\.', perl=TRUE)))
+    cols <- lapply(cols, function(s) str_split_fixed(s, ".", 1))
+    
+    tab <- do.call(rbind, cols)
+    
+    # match to index
+    if (!chem.prot) {   # chemical-protein links have jumbled tax.ids in second column.
+      .taxids <- unique(tab[,1])
+      if (any(!found.tax[.taxids])) {
+        ## do something
+      }
+    }
+    
+    # match
+    for (taxo in taxonomies) {
+      rows <- tab[,tax.column] == taxo
+      if (sum(rows) > 0) {
+        write.table(tab[rows, -tax.columns], taxo.fn, append=TRUE,  sep='\t', quote=FALSE, col.names=FALSE, row.names=FALSE)
+        
+        if (sum(rows) == nrow(tab)) {
+          break
+        }
+      }
+    }
+    
     taxo.ids <- substr(input, 1, regexpr('.', input, fixed=TRUE)-1)  # Extract tax.ids
     taxos <- unique(taxo.ids)
     taxo.counts <- table(taxo.ids)
